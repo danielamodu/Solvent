@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 import {IObligationRegistry} from "./interfaces/IObligationRegistry.sol";
+import {ITreasuryVault} from "./interfaces/ITreasuryVault.sol";
 
 /// @title ObligationRegistry
 /// @notice Phase 2: the ledger of the treasury's forward commitments and the
@@ -29,14 +30,21 @@ contract ObligationRegistry is IObligationRegistry, Ownable {
     /// @dev Set once at construction; immutable for now (governance-tunable later).
     uint256 public immutable reserveRequirement;
 
+    /// @notice TreasuryVault this registry settles obligations against.
+    /// @dev Immutable; the vault authorises this registry to `withdraw` on settle,
+    ///      so the two are mutually referencing and must be co-deployed.
+    address public immutable vault;
+
     /// @notice Obligations keyed by their deterministic id.
     mapping(bytes32 => Obligation) public obligations;
 
     /// @dev Running sum of all PENDING obligation amounts. See contract notes.
     uint256 private _outstandingAmount;
 
-    constructor(address initialOwner, uint256 reserveRequirement_) Ownable(initialOwner) {
+    constructor(address initialOwner, uint256 reserveRequirement_, address vault_) Ownable(initialOwner) {
+        require(vault_ != address(0), "ObligationRegistry: vault is zero address");
         reserveRequirement = reserveRequirement_;
+        vault = vault_;
     }
 
     /// @inheritdoc IObligationRegistry
@@ -78,13 +86,23 @@ contract ObligationRegistry is IObligationRegistry, Ownable {
     }
 
     /// @inheritdoc IObligationRegistry
+    /// @dev Settlement moves real funds: the vault pays the beneficiary the
+    ///      obligation amount. State is updated before the external `withdraw`
+    ///      call (checks-effects-interactions) so a re-entrant settle of the same
+    ///      id hits the non-PENDING guard, and a vault revert (e.g. insufficient
+    ///      available balance) rolls the whole settlement back.
     function settleObligation(bytes32 id) external override onlyOwner {
         Obligation storage o = obligations[id];
         require(o.id == id, "ObligationRegistry: unknown obligation");
         require(o.status == Status.PENDING, "ObligationRegistry: not pending");
 
+        uint256 amount = o.amount;
+        address beneficiary = o.beneficiary;
+
         o.status = Status.SETTLED;
-        _outstandingAmount -= o.amount;
+        _outstandingAmount -= amount;
+
+        ITreasuryVault(vault).withdraw(amount, beneficiary);
 
         emit ObligationSettled(id);
     }

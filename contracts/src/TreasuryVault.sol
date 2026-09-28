@@ -53,7 +53,14 @@ contract TreasuryVault is ITreasuryVault, Ownable {
 
     /// @inheritdoc ITreasuryVault
     /// @dev Bounded by idle balance: deployed capital must be recalled first.
-    function withdraw(uint256 amount, address recipient) external override onlyOwner {
+    ///      Callable by the owner (manual withdrawals) or the obligation registry
+    ///      (paying a beneficiary on settlement) — the registry is trusted and
+    ///      wired in at construction.
+    function withdraw(uint256 amount, address recipient) external override {
+        require(
+            msg.sender == owner() || msg.sender == obligationRegistry,
+            "TreasuryVault: not authorized"
+        );
         require(amount <= availableBalance(), "TreasuryVault: insufficient balance");
         _totalAssets -= amount;
         asset.safeTransfer(recipient, amount);
