@@ -2,11 +2,49 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ObligationRegistry} from "../src/ObligationRegistry.sol";
 import {IObligationRegistry} from "../src/interfaces/IObligationRegistry.sol";
 
+/// @dev Minimal mintable 6-decimal ERC-20 standing in for USDC in these tests.
+contract MockToken is ERC20 {
+    constructor() ERC20("Mock USD Coin", "USDC") {}
+
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+
+    function decimals() public pure override returns (uint8) {
+        return 6;
+    }
+}
+
+/// @dev Stand-in for TreasuryVault: records `withdraw` calls and pays the
+///      recipient from its own token balance, so settlement transfers can be
+///      asserted (and revert naturally when the balance is insufficient).
+contract MockVault {
+    IERC20 public immutable token;
+    uint256 public withdrawCalls;
+    uint256 public lastAmount;
+    address public lastRecipient;
+
+    constructor(address token_) {
+        token = IERC20(token_);
+    }
+
+    function withdraw(uint256 amount, address recipient) external {
+        withdrawCalls++;
+        lastAmount = amount;
+        lastRecipient = recipient;
+        token.transfer(recipient, amount);
+    }
+}
+
 contract ObligationRegistryTest is Test {
     ObligationRegistry internal registry;
+    MockToken internal token;
+    MockVault internal mockVault;
 
     address internal owner = address(this);
     address internal beneficiary = makeAddr("beneficiary");
@@ -15,7 +53,12 @@ contract ObligationRegistryTest is Test {
     uint256 internal constant RESERVE = 100e6;
 
     function setUp() public {
-        registry = new ObligationRegistry(owner, RESERVE);
+        token = new MockToken();
+        mockVault = new MockVault(address(token));
+        registry = new ObligationRegistry(owner, RESERVE, address(mockVault));
+
+        // Fund the vault generously so settlements in the shared tests succeed.
+        token.mint(address(mockVault), 10_000e6);
     }
 
     /// @dev Creates a PENDING obligation with fixed beneficiary/dueAt/priority.
@@ -112,5 +155,41 @@ contract ObligationRegistryTest is Test {
         registry.cancelObligation(id);
         vm.expectRevert();
         registry.cancelObligation(id);
+    }
+
+    // ── settlement moves funds ──────────────────────────────────────────────
+
+    function test_settle_transfers_funds_to_beneficiary() public {
+        bytes32 id = _create(250e6);
+
+        registry.settleObligation(id);
+
+        assertEq(token.balanceOf(beneficiary), 250e6);
+        assertEq(mockVault.withdrawCalls(), 1);
+        assertEq(mockVault.lastAmount(), 250e6);
+        assertEq(mockVault.lastRecipient(), beneficiary);
+        assertEq(registry.getOutstandingAmount(), 0);
+    }
+
+    function test_settle_reverts_if_vault_has_insufficient_balance() public {
+        // A registry pointed at an unfunded vault: settling a $100k obligation
+        // must revert when the vault cannot pay it.
+        MockVault poorVault = new MockVault(address(token));
+        ObligationRegistry poorRegistry = new ObligationRegistry(owner, RESERVE, address(poorVault));
+
+        bytes32 id = poorRegistry.createObligation(
+            beneficiary,
+            100_000e6,
+            block.timestamp + 30 days,
+            IObligationRegistry.Priority.HIGH
+        );
+
+        vm.expectRevert();
+        poorRegistry.settleObligation(id);
+
+        // The failed settlement rolled back: still outstanding, still PENDING.
+        assertEq(poorRegistry.getOutstandingAmount(), 100_000e6);
+        ( , , , , , IObligationRegistry.Status status) = poorRegistry.obligations(id);
+        assertEq(uint256(status), uint256(IObligationRegistry.Status.PENDING));
     }
 }

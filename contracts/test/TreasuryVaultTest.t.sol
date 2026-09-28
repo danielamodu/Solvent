@@ -38,8 +38,15 @@ contract TreasuryVaultTest is Test {
 
     function setUp() public {
         usdc = new MockUSDC();
-        registry = new ObligationRegistry(owner, RESERVE);
-        vault = new TreasuryVault(address(usdc), owner, address(registry));
+
+        // Vault and registry reference each other via immutables, so break the
+        // cycle by predicting the registry's CREATE address (deployer's next
+        // nonce after the vault) and wiring it into the vault up front.
+        uint256 vaultNonce = vm.getNonce(address(this));
+        address predictedRegistry = vm.computeCreateAddress(address(this), vaultNonce + 1);
+        vault = new TreasuryVault(address(usdc), owner, predictedRegistry);
+        registry = new ObligationRegistry(owner, RESERVE, address(vault));
+        require(address(registry) == predictedRegistry, "registry address prediction mismatch");
         strategy = new MockStrategy(address(vault), address(usdc));
 
         usdc.mint(depositor, 1_000e6);
@@ -208,8 +215,51 @@ contract TreasuryVaultTest is Test {
         assertEq(vault.availableBalance(), 500e6);
         assertEq(strategy.totalValue(), 0);
 
-        // settle the obligation → protected drops to just the reserve (100e6)
+        // settle the obligation → the vault pays the beneficiary $150k, so
+        // totalAssets drops and protected liquidity falls to just the reserve.
         registry.settleObligation(id);
-        assertEq(vault.deployableCapital(), 400e6);
+        assertEq(usdc.balanceOf(beneficiary), 150e6);
+        assertEq(vault.totalAssets(), 350e6);
+        // deployable = 350e6 total - 100e6 reserve - 0 deployed = 250e6
+        assertEq(vault.deployableCapital(), 250e6);
+    }
+
+    /// @dev The MVP "complete" loop from the spec, asserting the invariant
+    ///      boundary at each step: deposit → obligation → deploy surplus →
+    ///      second obligation (shortfall) → recall → settle (funds move out).
+    function test_full_core_loop() public {
+        // 1. deposit $500k
+        _deposit(500e6);
+        assertEq(vault.totalAssets(), 500e6);
+
+        // 2. create a $145k obligation → protected = $100k reserve + $145k
+        bytes32 first = _createObligation(145e6);
+        assertEq(registry.protectedLiquidity(), 245e6);
+
+        // 3. surplus free to deploy = 500 - 245 = $255k
+        assertEq(vault.deployableCapital(), 255e6);
+
+        // 4. deploy the full surplus → nothing left deployable
+        vault.deployToStrategy(address(strategy), 255e6);
+        assertEq(vault.deployableCapital(), 0);
+        assertEq(vault.totalDeployed(), 255e6);
+
+        // 5. a new urgent $50k obligation pushes protected to $295k > idle $245k:
+        //    a liquidity shortfall, and still nothing deployable.
+        _createObligation(50e6);
+        assertEq(registry.protectedLiquidity(), 295e6);
+        assertEq(vault.deployableCapital(), 0);
+
+        // 6. recall $50k to restore idle liquidity
+        vault.recallFromStrategy(address(strategy), 50e6);
+        assertEq(vault.totalDeployed(), 205e6);
+        assertEq(vault.deployableCapital(), 0); // 500 - 295 - 205
+
+        // 7. settle the first obligation → $145k paid to the beneficiary
+        registry.settleObligation(first);
+        assertEq(usdc.balanceOf(beneficiary), 145e6);
+
+        // 8. only the $50k urgent obligation remains outstanding
+        assertEq(registry.getOutstandingAmount(), 50e6);
     }
 }
