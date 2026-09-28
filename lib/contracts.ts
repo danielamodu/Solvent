@@ -102,10 +102,83 @@ export const treasuryVaultAbi = [
     ],
     outputs: [],
   },
+  {
+    type: "function",
+    name: "deployToStrategy",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "strategy", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [],
+  },
 ] as const;
 
 /** ABI for the ObligationRegistry — the read side of the liquidity engine. */
 export const OBLIGATION_REGISTRY_ABI = [
+  {
+    type: "event",
+    name: "ObligationCreated",
+    anonymous: false,
+    inputs: [
+      { name: "id", type: "bytes32", indexed: true },
+      { name: "beneficiary", type: "address", indexed: false },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "dueAt", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "ObligationCancelled",
+    anonymous: false,
+    inputs: [{ name: "id", type: "bytes32", indexed: true }],
+  },
+  {
+    type: "event",
+    name: "ObligationSettled",
+    anonymous: false,
+    inputs: [{ name: "id", type: "bytes32", indexed: true }],
+  },
+  {
+    type: "function",
+    name: "createObligation",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "beneficiary", type: "address" },
+      { name: "amount", type: "uint256" },
+      { name: "dueAt", type: "uint256" },
+      { name: "priority", type: "uint8" },
+    ],
+    outputs: [{ name: "id", type: "bytes32" }],
+  },
+  {
+    type: "function",
+    name: "cancelObligation",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "id", type: "bytes32" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "settleObligation",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "id", type: "bytes32" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "obligations",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "bytes32" }],
+    outputs: [
+      { name: "id", type: "bytes32" },
+      { name: "beneficiary", type: "address" },
+      { name: "amount", type: "uint256" },
+      { name: "dueAt", type: "uint256" },
+      { name: "priority", type: "uint8" },
+      { name: "status", type: "uint8" },
+    ],
+  },
   {
     type: "function",
     name: "protectedLiquidity",
@@ -127,6 +200,19 @@ export const OBLIGATION_REGISTRY_ABI = [
     inputs: [],
     outputs: [{ name: "", type: "uint256" }],
   },
+] as const;
+
+/** Priority enum (matches IObligationRegistry.Priority ordering). */
+export const PRIORITY = { HIGH: 0, MEDIUM: 1, LOW: 2 } as const;
+export const PRIORITY_LABELS = ["HIGH", "MEDIUM", "LOW"] as const;
+
+/** Status enum (matches IObligationRegistry.Status ordering). */
+export const STATUS_LABELS = [
+  "PENDING",
+  "FUNDED",
+  "SETTLED",
+  "CANCELLED",
+  "DEFAULTED",
 ] as const;
 
 /** ABI for the MockStrategy adapter — the read side of a deployed position. */
@@ -163,3 +249,14 @@ export const obligationRegistryAddress = parseAddress(
 export const mockStrategyAddress = parseAddress(
   process.env.NEXT_PUBLIC_MOCK_STRATEGY_ADDRESS
 );
+
+/** Block the registry was deployed at — the `fromBlock` for scanning
+ *  ObligationCreated logs, so the public RPC isn't asked to scan from genesis. */
+export const obligationRegistryDeployBlock: bigint = (() => {
+  const raw = process.env.NEXT_PUBLIC_OBLIGATION_REGISTRY_DEPLOY_BLOCK;
+  try {
+    return raw ? BigInt(raw) : 0n;
+  } catch {
+    return 0n;
+  }
+})();
