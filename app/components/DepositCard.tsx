@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatUnits, parseUnits } from "viem";
+import { parseUnits } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import {
   CHAIN_ID,
@@ -10,14 +10,20 @@ import {
   treasuryVaultAddress,
   usdcAddress,
 } from "@/lib/contracts";
+import { formatUSD } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
+import { BusyLabel, TxFeedback } from "./ui";
 
 export function DepositCard({
   decimals,
   onChange,
+  disabled = false,
+  disabledReason,
 }: {
   decimals: number;
   onChange: () => void;
+  disabled?: boolean;
+  disabledReason?: string;
 }) {
   const { address } = useAccount();
   const [amount, setAmount] = useState("");
@@ -58,6 +64,8 @@ export function DepositCard({
     parsed = null;
   }
 
+  const insufficientBalance =
+    parsed !== null && balance.data !== undefined && parsed > balance.data;
   const needsApproval =
     parsed !== null && (allowance.data === undefined || allowance.data < parsed);
   const busy =
@@ -65,41 +73,55 @@ export function DepositCard({
     approve.isConfirming ||
     deposit.isPending ||
     deposit.isConfirming;
+  const activeTx =
+    deposit.hash || deposit.errorMessage || deposit.cancelled ? deposit : approve;
 
   return (
     <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
       <h2 className="text-sm font-medium text-neutral-200">Deposit USDC</h2>
       <p className="mt-1 text-xs text-neutral-500">
-        Wallet:{" "}
-        {balance.data !== undefined
-          ? formatUnits(balance.data, decimals)
-          : "—"}{" "}
-        USDC
+        Wallet: {formatUSD(balance.data, decimals)}
       </p>
       <input
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         placeholder="0.0"
         inputMode="decimal"
-        className="mt-3 w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-neutral-600"
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
+        className="mt-3 w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50"
       />
       {needsApproval ? (
-        <button
-          onClick={() =>
-            parsed !== null &&
-            approve.writeContract({
-              address: usdc,
-              abi: erc20Abi,
-              functionName: "approve",
-              args: [vault, parsed],
-              chainId: CHAIN_ID,
-            })
-          }
-          disabled={parsed === null || busy}
-          className="mt-3 w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
-        >
-          {approve.isPending || approve.isConfirming ? "Approving…" : "Approve USDC"}
-        </button>
+        <>
+          <button
+            onClick={() =>
+              parsed !== null &&
+              approve.writeContract({
+                address: usdc,
+                abi: erc20Abi,
+                functionName: "approve",
+                args: [vault, parsed],
+                chainId: CHAIN_ID,
+              })
+            }
+            disabled={parsed === null || parsed === 0n || insufficientBalance || busy || disabled}
+            title={disabled ? disabledReason : undefined}
+            className="mt-3 w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+          >
+            <BusyLabel busy={approve.isPending || approve.isConfirming}>
+              {approve.isPending
+                ? "Confirm in wallet…"
+                : approve.isConfirming
+                  ? "Approving…"
+                  : "Approve USDC"}
+            </BusyLabel>
+          </button>
+          {!insufficientBalance && parsed !== null && (
+            <p className="mt-2 text-[11px] text-neutral-500">
+              One-time approval so the vault can pull your USDC, then deposit.
+            </p>
+          )}
+        </>
       ) : (
         <button
           onClick={() =>
@@ -112,17 +134,23 @@ export function DepositCard({
               chainId: CHAIN_ID,
             })
           }
-          disabled={parsed === null || parsed === 0n || busy}
+          disabled={parsed === null || parsed === 0n || insufficientBalance || busy || disabled}
+          title={disabled ? disabledReason : undefined}
           className="mt-3 w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
         >
-          {deposit.isPending || deposit.isConfirming ? "Depositing…" : "Deposit"}
+          <BusyLabel busy={deposit.isPending || deposit.isConfirming}>
+            {deposit.isPending
+              ? "Confirm in wallet…"
+              : deposit.isConfirming
+                ? "Depositing…"
+                : "Deposit"}
+          </BusyLabel>
         </button>
       )}
-      {(approve.errorMessage || deposit.errorMessage) && (
-        <p className="mt-2 break-words text-xs text-red-400">
-          {approve.errorMessage || deposit.errorMessage}
-        </p>
+      {insufficientBalance && (
+        <p className="mt-2 text-xs text-red-400">Insufficient balance.</p>
       )}
+      <TxFeedback tx={activeTx} />
     </div>
   );
 }

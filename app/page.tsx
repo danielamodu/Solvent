@@ -11,7 +11,7 @@ export default function Home() {
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Solvent</h1>
             <p className="mt-1 text-sm text-neutral-400">
-              Obligation-aware treasury — Phase 1: Treasury Vault
+              Obligation-aware treasury — deposit, deploy surplus, never break a promise
             </p>
           </div>
           <ConnectKitButton />
