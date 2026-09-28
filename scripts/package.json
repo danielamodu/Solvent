@@ -1,0 +1,7 @@
+{
+  "name": "solvent-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "One-off operational scripts (demo seeder). Run with ts-node from /keeper; not imported by the Next.js app."
+}
