@@ -6,6 +6,58 @@ export { erc20Abi };
 /** Target network for all vault reads/writes (Arbitrum Sepolia). */
 export const CHAIN_ID = arbitrumSepolia.id;
 
+/** Factory deployed once per network; each team discovers treasuries by owner. */
+export const treasuryFactoryAbi = [
+  {
+    type: "event",
+    name: "TreasuryCreated",
+    anonymous: false,
+    inputs: [
+      { name: "owner", type: "address", indexed: true },
+      { name: "vault", type: "address", indexed: true },
+      { name: "registry", type: "address", indexed: true },
+      { name: "strategy", type: "address", indexed: false },
+      { name: "asset", type: "address", indexed: false },
+      { name: "reserveRequirement", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "function",
+    name: "createTreasury",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "asset", type: "address" },
+      { name: "reserveRequirement", type: "uint256" },
+    ],
+    outputs: [
+      { name: "vaultAddress", type: "address" },
+      { name: "registryAddress", type: "address" },
+      { name: "strategyAddress", type: "address" },
+    ],
+  },
+  {
+    type: "function",
+    name: "getTreasuries",
+    stateMutability: "view",
+    inputs: [{ name: "owner", type: "address" }],
+    outputs: [{ name: "", type: "address[]" }],
+  },
+  {
+    type: "function",
+    name: "registryForVault",
+    stateMutability: "view",
+    inputs: [{ name: "vault", type: "address" }],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "strategyForVault",
+    stateMutability: "view",
+    inputs: [{ name: "vault", type: "address" }],
+    outputs: [{ name: "", type: "address" }],
+  },
+] as const;
+
 /** ABI for the deployed TreasuryVault (matches ITreasuryVault + Ownable getters). */
 export const treasuryVaultAbi = [
   {
@@ -23,6 +75,24 @@ export const treasuryVaultAbi = [
     anonymous: false,
     inputs: [
       { name: "recipient", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "StrategyDeployed",
+    anonymous: false,
+    inputs: [
+      { name: "strategy", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "StrategyRecalled",
+    anonymous: false,
+    inputs: [
+      { name: "strategy", type: "address", indexed: true },
       { name: "amount", type: "uint256", indexed: false },
     ],
   },
@@ -80,6 +150,13 @@ export const treasuryVaultAbi = [
   },
   {
     type: "function",
+    name: "obligationRegistry",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
     name: "totalDeployed",
     stateMutability: "view",
     inputs: [],
@@ -101,6 +178,15 @@ export const treasuryVaultAbi = [
       { name: "amount", type: "uint256" },
     ],
     outputs: [],
+  },
+  {
+    type: "function",
+    name: "harvestStrategyYield",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "strategy", type: "address" },
+    ],
+    outputs: [{ name: "amount", type: "uint256" }],
   },
   {
     type: "function",
@@ -200,6 +286,13 @@ export const OBLIGATION_REGISTRY_ABI = [
     inputs: [],
     outputs: [{ name: "", type: "uint256" }],
   },
+  {
+    type: "function",
+    name: "vault",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
 ] as const;
 
 /** Priority enum (matches IObligationRegistry.Priority ordering). */
@@ -219,6 +312,20 @@ export const STATUS_LABELS = [
 export const MOCK_STRATEGY_ABI = [
   {
     type: "function",
+    name: "vault",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "asset",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
     name: "totalValue",
     stateMutability: "view",
     inputs: [],
@@ -227,6 +334,13 @@ export const MOCK_STRATEGY_ABI = [
   {
     type: "function",
     name: "availableLiquidity",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "claimableYield",
     stateMutability: "view",
     inputs: [],
     outputs: [{ name: "", type: "uint256" }],
@@ -241,6 +355,9 @@ function parseAddress(value: string | undefined): `0x${string}` | undefined {
 
 export const treasuryVaultAddress = parseAddress(
   process.env.NEXT_PUBLIC_TREASURY_VAULT_ADDRESS
+);
+export const treasuryFactoryAddress = parseAddress(
+  process.env.NEXT_PUBLIC_TREASURY_FACTORY_ADDRESS
 );
 export const usdcAddress = parseAddress(process.env.NEXT_PUBLIC_USDC_ADDRESS);
 export const obligationRegistryAddress = parseAddress(

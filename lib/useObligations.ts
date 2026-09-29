@@ -5,9 +5,9 @@ import { usePublicClient } from "wagmi";
 import {
   CHAIN_ID,
   OBLIGATION_REGISTRY_ABI,
-  obligationRegistryAddress,
   obligationRegistryDeployBlock,
 } from "@/lib/contracts";
+import { useTreasury } from "./treasury-context";
 
 export type ObligationRecord = {
   id: `0x${string}`;
@@ -25,15 +25,16 @@ export type ObligationRecord = {
  */
 export function useObligations() {
   const publicClient = usePublicClient({ chainId: CHAIN_ID });
+  const { treasury } = useTreasury();
   const [obligations, setObligations] = useState<ObligationRecord[]>([]);
   const [isLoading, setLoading] = useState(false);
 
   const refetch = useCallback(async () => {
-    if (!publicClient || !obligationRegistryAddress) return;
+    if (!publicClient || !treasury?.registry) return;
     setLoading(true);
     try {
       const logs = await publicClient.getContractEvents({
-        address: obligationRegistryAddress,
+        address: treasury.registry,
         abi: OBLIGATION_REGISTRY_ABI,
         eventName: "ObligationCreated",
         fromBlock: obligationRegistryDeployBlock,
@@ -47,7 +48,7 @@ export function useObligations() {
       const records = await Promise.all(
         ids.map(async (id) => {
           const r = (await publicClient.readContract({
-            address: obligationRegistryAddress!,
+            address: treasury.registry,
             abi: OBLIGATION_REGISTRY_ABI,
             functionName: "obligations",
             args: [id],
@@ -76,7 +77,7 @@ export function useObligations() {
     } finally {
       setLoading(false);
     }
-  }, [publicClient]);
+  }, [publicClient, treasury?.registry]);
 
   useEffect(() => {
     refetch();
