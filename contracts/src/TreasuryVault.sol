@@ -25,7 +25,7 @@ contract TreasuryVault is ITreasuryVault, Ownable {
     IERC20 public immutable asset;
 
     /// @notice Registry of outstanding obligations that gates deployable capital.
-    address public immutable obligationRegistry;
+    address public obligationRegistry;
 
     /// @notice Principal currently deployed to each strategy adapter.
     mapping(address => uint256) public strategyPositions;
@@ -37,11 +37,21 @@ contract TreasuryVault is ITreasuryVault, Ownable {
     ///      by deploy/recall — deployed capital remains treasury-owned.
     uint256 private _totalAssets;
 
+    event ObligationRegistryConfigured(address indexed registry);
+    event StrategyYieldHarvested(address indexed strategy, uint256 amount);
+
     constructor(address asset_, address initialOwner, address obligationRegistry_) Ownable(initialOwner) {
         require(asset_ != address(0), "TreasuryVault: asset is zero address");
-        require(obligationRegistry_ != address(0), "TreasuryVault: registry is zero address");
         asset = IERC20(asset_);
         obligationRegistry = obligationRegistry_;
+    }
+
+    /// @notice One-time registry wiring used by TreasuryFactory during atomic setup.
+    function setObligationRegistry(address registry_) external onlyOwner {
+        require(obligationRegistry == address(0), "TreasuryVault: registry already set");
+        require(registry_ != address(0), "TreasuryVault: registry is zero address");
+        obligationRegistry = registry_;
+        emit ObligationRegistryConfigured(registry_);
     }
 
     /// @inheritdoc ITreasuryVault
@@ -82,6 +92,7 @@ contract TreasuryVault is ITreasuryVault, Ownable {
     /// @notice Capital free to deploy after protected liquidity and existing
     ///         deployments: deployable = totalAssets - protectedLiquidity - totalDeployed.
     function deployableCapital() public view returns (uint256) {
+        require(obligationRegistry != address(0), "TreasuryVault: registry not configured");
         uint256 protected = IObligationRegistry(obligationRegistry).protectedLiquidity();
         if (protected >= _totalAssets) {
             return 0;
@@ -122,5 +133,14 @@ contract TreasuryVault is ITreasuryVault, Ownable {
         IStrategyAdapter(strategy).withdraw(amount);
 
         emit StrategyRecalled(strategy, amount);
+    }
+
+    /// @notice Claim strategy yield into idle vault liquidity without changing
+    ///         the strategy's recorded principal position.
+    function harvestStrategyYield(address strategy) external onlyOwner returns (uint256 amount) {
+        require(strategy != address(0), "TreasuryVault: strategy is zero address");
+        amount = IStrategyAdapter(strategy).harvestYield();
+        _totalAssets += amount;
+        emit StrategyYieldHarvested(strategy, amount);
     }
 }

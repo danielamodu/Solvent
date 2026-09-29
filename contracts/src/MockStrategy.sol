@@ -54,4 +54,14 @@ contract MockStrategy is IStrategyAdapter {
     function availableLiquidity() external view override returns (uint256) {
         return asset.balanceOf(address(this));
     }
+
+    /// @inheritdoc IStrategyAdapter
+    function harvestYield() external view override onlyVault returns (uint256) {
+        return 0;
+    }
+
+    /// @inheritdoc IStrategyAdapter
+    function claimableYield() external pure override returns (uint256) {
+        return 0;
+    }
 }

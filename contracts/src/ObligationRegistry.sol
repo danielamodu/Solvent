@@ -31,9 +31,7 @@ contract ObligationRegistry is IObligationRegistry, Ownable {
     uint256 public immutable reserveRequirement;
 
     /// @notice TreasuryVault this registry settles obligations against.
-    /// @dev Immutable; the vault authorises this registry to `withdraw` on settle,
-    ///      so the two are mutually referencing and must be co-deployed.
-    address public immutable vault;
+    address public vault;
 
     /// @notice Obligations keyed by their deterministic id.
     mapping(bytes32 => Obligation) public obligations;
@@ -41,10 +39,19 @@ contract ObligationRegistry is IObligationRegistry, Ownable {
     /// @dev Running sum of all PENDING obligation amounts. See contract notes.
     uint256 private _outstandingAmount;
 
+    event VaultConfigured(address indexed vault);
+
     constructor(address initialOwner, uint256 reserveRequirement_, address vault_) Ownable(initialOwner) {
-        require(vault_ != address(0), "ObligationRegistry: vault is zero address");
         reserveRequirement = reserveRequirement_;
         vault = vault_;
+    }
+
+    /// @notice One-time vault wiring used by TreasuryFactory during atomic setup.
+    function setVault(address vault_) external onlyOwner {
+        require(vault == address(0), "ObligationRegistry: vault already set");
+        require(vault_ != address(0), "ObligationRegistry: vault is zero address");
+        vault = vault_;
+        emit VaultConfigured(vault_);
     }
 
     /// @inheritdoc IObligationRegistry
@@ -92,6 +99,7 @@ contract ObligationRegistry is IObligationRegistry, Ownable {
     ///      id hits the non-PENDING guard, and a vault revert (e.g. insufficient
     ///      available balance) rolls the whole settlement back.
     function settleObligation(bytes32 id) external override onlyOwner {
+        require(vault != address(0), "ObligationRegistry: vault not configured");
         Obligation storage o = obligations[id];
         require(o.id == id, "ObligationRegistry: unknown obligation");
         require(o.status == Status.PENDING, "ObligationRegistry: not pending");
