@@ -6,8 +6,8 @@ import { useAccount } from "wagmi";
 import {
   CHAIN_ID,
   treasuryVaultAbi,
-  treasuryVaultAddress,
 } from "@/lib/contracts";
+import { useTreasury } from "@/lib/treasury-context";
 import { useTx } from "@/lib/useTx";
 import { BusyLabel, TxFeedback } from "./ui";
 
@@ -25,10 +25,11 @@ export function WithdrawCard({
   disabledReason?: string;
 }) {
   const { address } = useAccount();
+  const { treasury } = useTreasury();
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
 
-  const vault = treasuryVaultAddress!;
+  const vault = treasury!.vault;
   const withdraw = useTx(onChange);
 
   let parsed: bigint | null = null;

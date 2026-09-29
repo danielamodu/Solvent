@@ -5,11 +5,11 @@ import { isAddress, parseUnits } from "viem";
 import {
   CHAIN_ID,
   OBLIGATION_REGISTRY_ABI,
-  obligationRegistryAddress,
   PRIORITY,
   PRIORITY_LABELS,
   STATUS_LABELS,
 } from "@/lib/contracts";
+import { useTreasury } from "@/lib/treasury-context";
 import { formatDueDate, formatUSD, relativeDue, shortenAddress } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
 import type { ObligationRecord } from "@/lib/useObligations";
@@ -23,6 +23,7 @@ const PRIORITY_OPTIONS = [
 
 export function ObligationCard({
   decimals,
+  availableBalance,
   isOwner,
   obligations,
   refetch,
@@ -31,6 +32,7 @@ export function ObligationCard({
   disabledReason,
 }: {
   decimals: number;
+  availableBalance?: bigint;
   isOwner: boolean;
   obligations: ObligationRecord[];
   refetch: () => void;
@@ -43,8 +45,10 @@ export function ObligationCard({
   const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState<number>(PRIORITY.MEDIUM);
   const [activeId, setActiveId] = useState<`0x${string}` | null>(null);
+  const [review, setReview] = useState<{ id: `0x${string}`; fn: "settleObligation" | "cancelObligation" } | null>(null);
 
-  const registry = obligationRegistryAddress!;
+  const { treasury } = useTreasury();
+  const registry = treasury!.registry;
   const done = () => {
     refetch();
     onChange();
@@ -61,7 +65,7 @@ export function ObligationCard({
   } catch {
     parsedAmount = null;
   }
-  const dueAt = dueDate ? Math.floor(new Date(dueDate).getTime() / 1000) : 0;
+  const dueAt = dueDate ? Math.floor(new Date(`${dueDate}T23:59:59`).getTime() / 1000) : 0;
   const validBeneficiary = isAddress(beneficiary.trim());
   const canCreate =
     isOwner &&
@@ -69,7 +73,7 @@ export function ObligationCard({
     validBeneficiary &&
     parsedAmount !== null &&
     parsedAmount > 0n &&
-    dueAt > 0;
+    dueAt > Math.floor(Date.now() / 1000);
   const creating = create.isPending || create.isConfirming;
   const rowBusy = rowTx.isPending || rowTx.isConfirming;
   const locked = !isOwner || disabled;
@@ -95,6 +99,12 @@ export function ObligationCard({
     id: `0x${string}`,
     fn: "settleObligation" | "cancelObligation"
   ) => {
+    setReview({ id, fn });
+  };
+
+  const confirmRowAction = () => {
+    if (!review) return;
+    const { id, fn } = review;
     setActiveId(id);
     rowTx.writeContract({
       address: registry,
@@ -103,6 +113,7 @@ export function ObligationCard({
       args: [id],
       chainId: CHAIN_ID,
     });
+    setReview(null);
   };
 
   const rows = [...obligations].reverse();
@@ -137,6 +148,7 @@ export function ObligationCard({
         <input
           type="date"
           value={dueDate}
+          min={new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10)}
           onChange={(e) => setDueDate(e.target.value)}
           disabled={locked}
           title={hint}
@@ -191,6 +203,25 @@ export function ObligationCard({
           />
         ))}
       </div>
+      {review && (() => {
+        const item = obligations.find(o => o.id === review.id);
+        if (!item) return null;
+        return <div className="mt-4 rounded-lg border border-amber-700/40 bg-amber-950/20 p-4">
+          <h3 className="text-sm font-semibold text-amber-100">Review {review.fn === "settleObligation" ? "payment" : "cancellation"}</h3>
+          <p className="mt-2 text-xs leading-5 text-amber-100/80">
+            {review.fn === "settleObligation"
+              ? <>Send <strong>{formatUSD(item.amount, decimals)}</strong> to <code>{shortenAddress(item.beneficiary)}</code>. This pays from idle vault funds and marks the obligation settled.</>
+              : <>Cancel the <strong>{formatUSD(item.amount, decimals)}</strong> obligation to <code>{shortenAddress(item.beneficiary)}</code>. This releases its protected liquidity.</>}
+          </p>
+          {review.fn === "settleObligation" && (availableBalance !== undefined && availableBalance < item.amount
+            ? <p className="mt-2 text-xs text-red-300">Not ready: the vault has {formatUSD(availableBalance, decimals)} idle, but this payment needs {formatUSD(item.amount, decimals)}. Recall funds first.</p>
+            : <p className="mt-2 text-xs text-neutral-400">Confirm in your wallet to submit this onchain payment to the beneficiary.</p>)}
+          <div className="mt-3 flex gap-2">
+            <button onClick={confirmRowAction} disabled={rowBusy || disabled || (review.fn === "settleObligation" && availableBalance !== undefined && availableBalance < item.amount)} className="rounded-md bg-white px-3 py-2 text-xs font-medium text-neutral-900 disabled:opacity-40"><BusyLabel busy={rowBusy}>Confirm in wallet</BusyLabel></button>
+            <button onClick={() => setReview(null)} disabled={rowBusy} className="rounded-md border border-neutral-700 px-3 py-2 text-xs text-neutral-300 disabled:opacity-40">Back</button>
+          </div>
+        </div>;
+      })()}
       <TxFeedback tx={rowTx} />
     </section>
   );
