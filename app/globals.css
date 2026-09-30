@@ -6,4 +6,27 @@ html,
 body {
   padding: 0;
   margin: 0;
+  color: #111827;
+  background: #ffffff;
+  font-family: Inter, "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
+
+.display-font { font-family: Manrope, Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.055em; }
+
+/* The existing dashboard primitives keep their semantic utility classes while
+   adopting the white and royal-blue canvas from the Superdesign screens. */
+.solvent-dashboard .bg-neutral-950 { background-color: #ffffff !important; }
+.solvent-dashboard .bg-neutral-900 { background-color: #ffffff !important; }
+.solvent-dashboard .bg-neutral-800 { background-color: #f1f5f9 !important; }
+.solvent-dashboard .border-neutral-800,
+.solvent-dashboard .border-neutral-700 { border-color: #e2e8f0 !important; }
+.solvent-dashboard .text-neutral-100,
+.solvent-dashboard .text-neutral-200,
+.solvent-dashboard .text-neutral-300 { color: #1a182b !important; }
+.solvent-dashboard .text-neutral-400 { color: #475569 !important; }
+.solvent-dashboard .text-neutral-500,
+.solvent-dashboard .text-neutral-600 { color: #64748b !important; }
+.solvent-dashboard .bg-blue-500 { background-color: #1d4ed8 !important; }
+.solvent-dashboard .text-blue-400,
+.solvent-dashboard .text-blue-300 { color: #1d4ed8 !important; }
+.solvent-dashboard .focus\:ring-neutral-600:focus { --tw-ring-color: #1d4ed8; }

@@ -7,9 +7,8 @@ import {
   CHAIN_ID,
   erc20Abi,
   treasuryVaultAbi,
-  treasuryVaultAddress,
-  usdcAddress,
 } from "@/lib/contracts";
+import { useTreasury } from "@/lib/treasury-context";
 import { formatUSD } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
 import { BusyLabel, TxFeedback } from "./ui";
@@ -26,10 +25,11 @@ export function DepositCard({
   disabledReason?: string;
 }) {
   const { address } = useAccount();
+  const { treasury } = useTreasury();
   const [amount, setAmount] = useState("");
 
-  const vault = treasuryVaultAddress!;
-  const usdc = usdcAddress!;
+  const vault = treasury!.vault;
+  const usdc = treasury!.asset;
 
   const balance = useReadContract({
     address: usdc,

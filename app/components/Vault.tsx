@@ -1,103 +1,107 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { formatUnits } from "viem";
-import { useAccount, useReadContract, useSwitchChain } from "wagmi";
+import { useAccount, usePublicClient, useReadContract, useSwitchChain } from "wagmi";
 import {
   CHAIN_ID,
   erc20Abi,
   MOCK_STRATEGY_ABI,
-  mockStrategyAddress,
   OBLIGATION_REGISTRY_ABI,
-  obligationRegistryAddress,
+  treasuryFactoryAbi,
+  treasuryFactoryAddress,
   treasuryVaultAbi,
-  treasuryVaultAddress,
-  usdcAddress,
 } from "@/lib/contracts";
-import { formatUSD } from "@/lib/format";
+import { formatUSD, shortenAddress } from "@/lib/format";
 import { useObligations } from "@/lib/useObligations";
+import { useTreasury } from "@/lib/treasury-context";
 import { DepositCard } from "./DepositCard";
 import { LiquidityTimeline } from "./LiquidityTimeline";
 import { ObligationCard } from "./ObligationCard";
 import { ShortfallAlert } from "./ShortfallAlert";
 import { StrategyCard } from "./StrategyCard";
+import { TreasurySetup } from "./TreasurySetup";
 import { Skeleton } from "./ui";
 import { WithdrawCard } from "./WithdrawCard";
 
 export function Vault() {
   const { address, isConnected, chainId } = useAccount();
+  const publicClient = usePublicClient({ chainId: CHAIN_ID });
   const { switchChain } = useSwitchChain();
+  const { treasury, setTreasury, hydrated } = useTreasury();
+  const [showSetup, setShowSetup] = useState(false);
 
-  const configured = Boolean(treasuryVaultAddress && usdcAddress);
+  const configured = Boolean(treasury?.vault && treasury?.asset && treasury?.registry);
 
   const totalAssets = useReadContract({
-    address: treasuryVaultAddress,
+    address: treasury?.vault,
     abi: treasuryVaultAbi,
     functionName: "totalAssets",
     chainId: CHAIN_ID,
     query: { enabled: configured },
   });
   const available = useReadContract({
-    address: treasuryVaultAddress,
+    address: treasury?.vault,
     abi: treasuryVaultAbi,
     functionName: "availableBalance",
     chainId: CHAIN_ID,
     query: { enabled: configured },
   });
   const deployable = useReadContract({
-    address: treasuryVaultAddress,
+    address: treasury?.vault,
     abi: treasuryVaultAbi,
     functionName: "deployableCapital",
     chainId: CHAIN_ID,
     query: { enabled: configured },
   });
   const deployed = useReadContract({
-    address: treasuryVaultAddress,
+    address: treasury?.vault,
     abi: treasuryVaultAbi,
     functionName: "totalDeployed",
     chainId: CHAIN_ID,
     query: { enabled: configured },
   });
   const protectedLiquidity = useReadContract({
-    address: obligationRegistryAddress,
+    address: treasury?.registry,
     abi: OBLIGATION_REGISTRY_ABI,
     functionName: "protectedLiquidity",
     chainId: CHAIN_ID,
-    query: { enabled: configured && Boolean(obligationRegistryAddress) },
+    query: { enabled: configured },
   });
   const ownerRead = useReadContract({
-    address: treasuryVaultAddress,
+    address: treasury?.vault,
     abi: treasuryVaultAbi,
     functionName: "owner",
     chainId: CHAIN_ID,
     query: { enabled: configured },
   });
   const decimalsRead = useReadContract({
-    address: usdcAddress,
+    address: treasury?.asset,
     abi: erc20Abi,
     functionName: "decimals",
     chainId: CHAIN_ID,
     query: { enabled: configured },
   });
   const outstanding = useReadContract({
-    address: obligationRegistryAddress,
+    address: treasury?.registry,
     abi: OBLIGATION_REGISTRY_ABI,
     functionName: "getOutstandingAmount",
     chainId: CHAIN_ID,
-    query: { enabled: configured && Boolean(obligationRegistryAddress) },
+    query: { enabled: configured },
   });
   const reserve = useReadContract({
-    address: obligationRegistryAddress,
+    address: treasury?.registry,
     abi: OBLIGATION_REGISTRY_ABI,
     functionName: "reserveRequirement",
     chainId: CHAIN_ID,
-    query: { enabled: configured && Boolean(obligationRegistryAddress) },
+    query: { enabled: configured },
   });
-  const strategyValue = useReadContract({
-    address: mockStrategyAddress,
+  const strategyLiquidity = useReadContract({
+    address: treasury?.strategy,
     abi: MOCK_STRATEGY_ABI,
-    functionName: "totalValue",
+    functionName: "availableLiquidity",
     chainId: CHAIN_ID,
-    query: { enabled: configured && Boolean(mockStrategyAddress) },
+    query: { enabled: configured && Boolean(treasury?.strategy) },
   });
 
   const decimals = decimalsRead.data ?? 6;
@@ -108,7 +112,7 @@ export function Vault() {
 
   const { obligations, refetch: refetchObligations } = useObligations();
 
-  // Coverage = (idle balance + value held in strategy) / promised obligations.
+  // Payment coverage counts idle funds and presently withdrawable strategy liquidity.
   // Null when nothing is owed yet (all capital is deployable) or before the
   // idle balance has loaded, so the meter shows the "no obligations" state
   // instead of flashing 0%.
@@ -118,8 +122,9 @@ export function Vault() {
   const coverage =
     outstandingData !== undefined &&
     outstandingData > 0n &&
-    available.data !== undefined
-      ? ((toNum(available.data) + toNum(strategyValue.data)) /
+    available.data !== undefined &&
+    strategyLiquidity.data !== undefined
+      ? ((toNum(available.data) + toNum(strategyLiquidity.data)) /
           toNum(outstandingData)) *
         100
       : null;
@@ -131,7 +136,7 @@ export function Vault() {
     deployed.refetch();
     protectedLiquidity.refetch();
     outstanding.refetch();
-    strategyValue.refetch();
+    strategyLiquidity.refetch();
   };
 
   // Wallet / network gating. The dashboard always renders (public reads work
@@ -153,15 +158,8 @@ export function Vault() {
     deployed.isError ||
     protectedLiquidity.isError;
 
-  if (!configured) {
-    return (
-      <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-5 text-sm text-neutral-400">
-        Set <code className="text-neutral-200">NEXT_PUBLIC_TREASURY_VAULT_ADDRESS</code> and{" "}
-        <code className="text-neutral-200">NEXT_PUBLIC_USDC_ADDRESS</code> in your env, then
-        rebuild to connect the vault.
-      </section>
-    );
-  }
+  if (!hydrated) return <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5 text-sm text-neutral-400">Loading treasury configuration…</div>;
+  if (!configured || showSetup) return <TreasurySetup onSelect={(value) => { setTreasury(value); setShowSetup(false); }} onCancel={configured ? () => setShowSetup(false) : undefined} />;
 
   return (
     <section className="flex flex-col gap-4">
@@ -203,6 +201,11 @@ export function Vault() {
         </div>
       )}
 
+      <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-xs">
+        <span>Connected treasury · {shortenAddress(treasury!.vault)}</span>
+        <button onClick={() => setShowSetup(true)} className="text-neutral-300 underline underline-offset-2">Change or add treasury</button>
+      </div>
+
       <LiquidityTimeline
         totalAssets={totalAssets.data}
         totalDeployed={deployed.data}
@@ -210,6 +213,9 @@ export function Vault() {
         reserveRequirement={reserve.data}
         outstandingAmount={outstanding.data}
         coverage={coverage}
+        availableBalance={available.data}
+        strategyLiquidity={strategyLiquidity.data}
+        strategyPosition={deployed.data}
         decimals={decimals}
         obligations={obligations}
       />
@@ -240,10 +246,17 @@ export function Vault() {
           loading={available.isLoading}
         />
       </div>
+      <section className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-xs text-neutral-400">
+        <h2 className="font-medium text-neutral-200">How liquidity is protected</h2>
+        <p className="mt-1">Protected liquidity is the reserve plus all pending obligations. Deployable capital is what remains after protected funds and existing deployments. Payment readiness assumes the displayed strategy liquidity can be withdrawn now.</p>
+        {typeof ownerRead.data === "string" && <p className="mt-2">Controls: owner only ({shortenAddress(ownerRead.data)}). If this owner is a Safe, its configured threshold governs approvals. EOA-owned treasuries require an explicit ownership transfer to use a Safe.</p>}
+      </section>
+      <DataFreshness updatedAt={totalAssets.dataUpdatedAt} />
 
-      {obligationRegistryAddress && (
+      {treasury?.registry && (
         <ObligationCard
           decimals={decimals}
+          availableBalance={available.data}
           isOwner={isOwner}
           obligations={obligations}
           refetch={refetchObligations}
@@ -266,7 +279,7 @@ export function Vault() {
           disabled={!canInteract}
           disabledReason={interactionHint}
         />
-        {mockStrategyAddress && (
+        {treasury?.strategy && (
           <StrategyCard
             decimals={decimals}
             isOwner={isOwner}
@@ -277,11 +290,22 @@ export function Vault() {
           />
         )}
       </div>
-      <KeeperStatus />
+      <KeeperStatus vault={treasury!.vault} />
+      <ReadinessAlerts
+        vault={treasury!.vault}
+        obligations={obligations}
+        protectedLiquidity={protectedLiquidity.data}
+        availableBalance={available.data}
+        strategyLiquidity={strategyLiquidity.data}
+        strategyPosition={deployed.data}
+        decimals={decimals}
+      />
+      <TreasuryActivity vault={treasury!.vault} />
       <ShortfallAlert
         protectedLiquidity={protectedLiquidity.data}
         availableBalance={available.data}
         totalDeployed={deployed.data}
+        strategyLiquidity={strategyLiquidity.data}
         decimals={decimals}
         isOwner={isOwner && canInteract}
         onChange={refresh}
@@ -317,12 +341,136 @@ function Stat({
 
 // Static placeholder — the keeper is a standalone off-chain process (see
 // /keeper), not wired to the app yet. Shows judges the automation exists.
-function KeeperStatus() {
-  return (
-    <div className="flex items-center gap-2 px-1 text-xs text-neutral-500">
-      <span className="h-2 w-2 rounded-full bg-neutral-600" aria-hidden />
-      <span className="font-medium text-neutral-400">Keeper</span>
-      <span>Not running · runs as a separate off-chain process</span>
+function KeeperStatus({ vault }: { vault: `0x${string}` }) {
+  const [status, setStatus] = useState<{ lastHeartbeat: number; state: string; lastAction: string | null; lastError: string | null } | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const response = await fetch(`/api/treasuries/${vault}/keeper`, { cache: "no-store" });
+        const body = await response.json() as { keeper: typeof status };
+        if (active) { setStatus(body.keeper); setLoaded(true); }
+      } catch { if (active) setLoaded(true); }
+    };
+    void load();
+    const id = window.setInterval(() => void load(), 30_000);
+    return () => { active = false; window.clearInterval(id); };
+  }, [vault]);
+  const fresh = Boolean(status && Date.now() - status.lastHeartbeat < 120_000);
+  return <div className="flex flex-wrap items-center gap-2 px-1 text-xs text-neutral-500">
+    <span className={`h-2 w-2 rounded-full ${fresh && status?.state === "healthy" ? "bg-emerald-400" : fresh ? "bg-amber-400" : "bg-neutral-600"}`} aria-hidden />
+    <span className="font-medium text-neutral-400">Keeper</span>
+    <span>{fresh ? `${status?.state} · heartbeat ${Math.max(0, Math.floor((Date.now() - status!.lastHeartbeat) / 1000))}s ago` : loaded ? "No recent heartbeat" : "Checking heartbeat…"}</span>
+    {fresh && status?.lastAction && <span>· {status.lastAction}</span>}
+    {fresh && status?.lastError && <span className="text-amber-300">· {status.lastError}</span>}
+  </div>;
+}
+
+function DataFreshness({ updatedAt }: { updatedAt: number }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 15_000);
+    return () => window.clearInterval(id);
+  }, []);
+  if (!updatedAt) return <p className="px-1 text-xs text-neutral-500">Waiting for the first onchain read…</p>;
+  const seconds = Math.max(0, Math.floor((now - updatedAt) / 1000));
+  return <p className="px-1 text-xs text-neutral-500">Vault data updated {seconds < 5 ? "just now" : `${seconds}s ago`} · refreshes after confirmed actions.</p>;
+}
+
+function ReadinessAlerts({ vault, obligations, protectedLiquidity, availableBalance, strategyLiquidity, strategyPosition, decimals }: {
+  vault: `0x${string}`;
+  obligations: import("@/lib/useObligations").ObligationRecord[];
+  protectedLiquidity?: bigint;
+  availableBalance?: bigint;
+  strategyLiquidity?: bigint;
+  strategyPosition?: bigint;
+  decimals: number;
+}) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const id = window.setInterval(() => setNow(Date.now()), 60_000); return () => window.clearInterval(id); }, []);
+  const pending = obligations.filter(o => o.status === 0);
+  const overdue = pending.filter(o => Number(o.dueAt) < now / 1000);
+  const urgent = pending.filter(o => Number(o.dueAt) >= now / 1000 && Number(o.dueAt) <= now / 1000 + 7 * 86400);
+  const totalGap = protectedLiquidity !== undefined && availableBalance !== undefined && protectedLiquidity > availableBalance ? protectedLiquidity - availableBalance : 0n;
+  const reportedLiquidity = strategyLiquidity ?? 0n;
+  const recordedPosition = strategyPosition ?? 0n;
+  const recallable = reportedLiquidity < recordedPosition ? reportedLiquidity : recordedPosition;
+  const uncovered = totalGap > recallable ? totalGap - recallable : 0n;
+  const [notifications, setNotifications] = useState(false);
+  const [persistentAlerts, setPersistentAlerts] = useState<Array<{ id: string; type: string; message: string }>>([]);
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const response = await fetch(`/api/treasuries/${vault}/alerts`, { cache: "no-store" });
+        if (!response.ok) return;
+        const body = await response.json() as { alerts: Array<{ id: string; type: string; message: string }> };
+        if (active) setPersistentAlerts(body.alerts);
+      } catch { /* onchain readiness remains available if the service is offline */ }
+    };
+    void load();
+    const id = window.setInterval(() => void load(), 60_000);
+    return () => { active = false; window.clearInterval(id); };
+  }, [vault]);
+  useEffect(() => { setNotifications(typeof Notification !== "undefined" && Notification.permission === "granted"); }, []);
+  useEffect(() => {
+    if (!notifications || typeof Notification === "undefined") return;
+    const seenKey = "solvent-notified-obligations";
+    let seen = new Set<string>();
+    try { seen = new Set(JSON.parse(localStorage.getItem(seenKey) ?? "[]") as string[]); } catch { /* ignore malformed local preference */ }
+    for (const o of [...overdue, ...urgent]) {
+      if (seen.has(o.id)) continue;
+      const isOverdue = Number(o.dueAt) < Date.now() / 1000;
+      new Notification(isOverdue ? "Solvent payment overdue" : "Solvent payment coming due", { body: `${formatUSD(o.amount, decimals)} ${isOverdue ? "was due" : "due"} ${new Date(Number(o.dueAt) * 1000).toLocaleDateString()}` });
+      seen.add(o.id);
+    }
+    localStorage.setItem(seenKey, JSON.stringify([...seen]));
+}, [notifications, urgent, overdue, decimals]);
+  if (!urgent.length && !overdue.length && totalGap === 0n && !persistentAlerts.length) return null;
+  return <section className="rounded-xl border border-amber-700/40 bg-amber-950/20 p-4">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div><h2 className="text-sm font-semibold text-amber-200">Treasury alerts</h2>
+        {overdue.length > 0 && <p className="mt-1 text-xs text-red-300">{overdue.length} pending {overdue.length === 1 ? "payment is" : "payments are"} overdue.</p>}
+        {urgent.length > 0 && <p className="mt-1 text-xs text-amber-100/80">{urgent.length} pending {urgent.length === 1 ? "payment is" : "payments are"} due within 7 days.</p>}
+        {totalGap > 0n && <p className="mt-1 text-xs text-amber-100/80">Protected funds exceed idle cash by {formatUSD(totalGap, decimals)}.{uncovered > 0n && ` ${formatUSD(uncovered, decimals)} remains uncovered after available strategy liquidity.`}</p>}
+        {persistentAlerts.map(alert => <p key={alert.id} className="mt-1 text-xs text-amber-100/80">{alert.message}</p>)}
+      </div>
+      {typeof Notification !== "undefined" && Notification.permission !== "granted" && <button onClick={async () => { const p = await Notification.requestPermission(); setNotifications(p === "granted"); }} className="rounded-lg border border-amber-700/50 px-3 py-2 text-xs text-amber-100">Enable browser reminders</button>}
+      {notifications && <span className="text-xs text-emerald-300">Browser reminders enabled while this dashboard is open</span>}
     </div>
-  );
+  </section>;
+}
+
+type ActivityItem = { id: string; text: string; timestamp: number };
+
+function TreasuryActivity({ vault }: { vault: `0x${string}` }) {
+  const [items, setItems] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const load = async () => {
+    setLoading(true);
+    setFailed(false);
+    try {
+      const response = await fetch(`/api/treasuries/${vault}/activity`, { cache: "no-store" });
+      if (!response.ok) throw new Error("Activity API unavailable");
+      const body = await response.json() as { activity: Array<{ id: string; detail: string; timestamp: number }> };
+      setItems(body.activity.map(item => ({ id: item.id, text: item.detail, timestamp: item.timestamp })));
+    } catch {
+      setFailed(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    void load();
+    const id = window.setInterval(() => void load(), 60_000);
+    return () => window.clearInterval(id);
+  }, [vault]);
+  return <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
+    <div className="flex items-center justify-between gap-3"><div><h2 className="text-sm font-medium text-neutral-200">Recent activity</h2><p className="mt-1 text-xs text-neutral-500">Latest treasury and obligation events onchain.</p></div><button onClick={() => void load()} disabled={loading} className="rounded-md border border-neutral-700 px-2.5 py-1.5 text-xs text-neutral-300 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh"}</button></div>
+    {failed && <p className="mt-3 text-xs text-amber-300">Could not load activity. Check the RPC and try again.</p>}
+    {items.length ? <ul className="mt-3 divide-y divide-neutral-800">{items.map(i => <li key={i.id} className="flex justify-between gap-3 py-2 text-xs"><span className="text-neutral-300">{i.text}</span><span className="shrink-0 text-neutral-500">{new Date(i.timestamp * 1000).toLocaleString()}</span></li>)}</ul> : !failed && <p className="mt-3 text-xs text-neutral-500">{loading ? "Loading recent activity…" : "No recent activity found."}</p>}
+    <p className="mt-2 text-[10px] text-neutral-600">Activity is indexed from deployment and stored for this treasury.</p>
+  </section>;
 }

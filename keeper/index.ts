@@ -57,6 +57,10 @@ const PRIVATE_KEY = (RAW_KEY.startsWith("0x") ? RAW_KEY : `0x${RAW_KEY}`) as Hex
 const INTERVAL_MS = Number(process.env.KEEPER_INTERVAL_MS ?? 60_000);
 const DRY_RUN = /^true$/i.test(process.env.KEEPER_DRY_RUN ?? "");
 const RUN_ONCE = /^true$/i.test(process.env.KEEPER_ONCE ?? "");
+const HEARTBEAT_URL = process.env.KEEPER_HEARTBEAT_URL;
+const HEARTBEAT_TOKEN = process.env.KEEPER_HEARTBEAT_TOKEN;
+let lastAction: string | null = null;
+let lastError: string | null = null;
 const DEPLOY_BLOCK = (() => {
   const raw = process.env.NEXT_PUBLIC_OBLIGATION_REGISTRY_DEPLOY_BLOCK;
   try {
@@ -109,6 +113,8 @@ function stamp(): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 function log(kind: string, msg: string): void {
+  if (["RECALL", "SETTLE", "TX", "IDLE"].includes(kind)) lastAction = `${kind}: ${msg}`.slice(0, 160);
+  if (kind === "ERROR" || kind === "WARN") lastError = msg.slice(0, 300);
   console.log(`[${stamp()}] ${kind} — ${msg}`);
 }
 function usd(v: bigint): string {
@@ -303,11 +309,24 @@ let inTick = false;
 async function safeTick(): Promise<void> {
   if (inTick) return; // don't overlap if a tick runs longer than the interval
   inTick = true;
+  lastError = null;
   try {
     await tick();
   } catch (e) {
+    lastError = errText(e).slice(0, 300);
     log("ERROR", `tick crashed (recovered): ${errText(e)}`);
   } finally {
+    if (HEARTBEAT_URL && HEARTBEAT_TOKEN) {
+      try {
+        const response = await fetch(HEARTBEAT_URL, {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: `Bearer ${HEARTBEAT_TOKEN}` },
+          body: JSON.stringify({ vault: VAULT, state: lastError ? "degraded" : "healthy", lastAction, lastError }),
+          signal: AbortSignal.timeout(8_000),
+        });
+        if (!response.ok) log("WARN", `heartbeat endpoint returned HTTP ${response.status}`);
+      } catch (e) { log("WARN", `heartbeat failed: ${errText(e)}`); }
+    }
     inTick = false;
   }
 }

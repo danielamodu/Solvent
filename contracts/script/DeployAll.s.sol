@@ -19,8 +19,8 @@ import {MockStrategy} from "../src/MockStrategy.sol";
 ///      Reads PRIVATE_KEY from the environment (becomes owner). Run (from /contracts):
 ///        forge script script/DeployAll.s.sol --rpc-url arbitrum_sepolia --broadcast
 contract DeployAll is Script {
-    /// @dev 100 USDC (6 decimals) held in reserve independent of obligations.
-    uint256 internal constant RESERVE_REQUIREMENT = 100_000_000;
+    /// @dev 100,000 USDC (6 decimals) held in reserve independent of obligations.
+    uint256 internal constant RESERVE_REQUIREMENT = 100_000_000_000;
 
     function run()
         external

@@ -15,6 +15,9 @@ type Props = {
   deployableCapital?: bigint;
   reserveRequirement?: bigint;
   outstandingAmount?: bigint;
+  availableBalance?: bigint;
+  strategyLiquidity?: bigint;
+  strategyPosition?: bigint;
   coverage: number | null;
   decimals: number;
   obligations: ObligationRecord[];
@@ -34,6 +37,9 @@ export function LiquidityTimeline({
   deployableCapital,
   reserveRequirement,
   outstandingAmount,
+  availableBalance,
+  strategyLiquidity,
+  strategyPosition,
   coverage,
   decimals,
   obligations,
@@ -55,6 +61,11 @@ export function LiquidityTimeline({
   const pending = obligations
     .filter((o) => o.status === 0)
     .sort((a, b) => (a.dueAt < b.dueAt ? -1 : a.dueAt > b.dueAt ? 1 : 0));
+  let cumulative = 0n;
+  const idle = availableBalance ?? 0n;
+  const recoverable = strategyPosition !== undefined && strategyLiquidity !== undefined
+    ? (strategyPosition < strategyLiquidity ? strategyPosition : strategyLiquidity)
+    : 0n;
 
   const coverageText = COVERAGE_TEXT[riskLevel(coverage)];
 
@@ -127,7 +138,14 @@ export function LiquidityTimeline({
               No upcoming obligations — the treasury owes nothing.
             </p>
           ) : (
-            pending.map((o) => (
+            pending.map((o) => {
+              cumulative += o.amount;
+              const prior = cumulative - o.amount;
+              const readyNow = o.amount <= idle - (prior < idle ? prior : idle);
+              const coveredAfterRecall = cumulative <= idle + recoverable;
+              const readiness = readyNow ? "Ready" : coveredAfterRecall ? "Needs recall" : "Shortfall";
+              const readinessStyle = readyNow ? "text-emerald-300" : coveredAfterRecall ? "text-amber-300" : "text-red-300";
+              return (
               <div
                 key={o.id}
                 className="flex items-center gap-3 rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2"
@@ -150,11 +168,11 @@ export function LiquidityTimeline({
                 <div className="shrink-0 text-sm font-semibold tabular-nums">
                   {formatUSD(o.amount, decimals)}
                 </div>
-                <span className="shrink-0 rounded-full bg-neutral-800 px-2 py-0.5 text-[10px] font-medium text-neutral-400">
-                  PENDING
+                <span className={`shrink-0 rounded-full bg-neutral-800 px-2 py-0.5 text-[10px] font-medium ${readinessStyle}`} title={`Capacity checked cumulatively for obligations due by this date; assumes strategy liquidity can be recalled.`}>
+                  {readiness}
                 </span>
               </div>
-            ))
+            )})
           )}
         </div>
       </div>

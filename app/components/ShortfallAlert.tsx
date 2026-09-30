@@ -2,10 +2,9 @@
 
 import {
   CHAIN_ID,
-  mockStrategyAddress,
   treasuryVaultAbi,
-  treasuryVaultAddress,
 } from "@/lib/contracts";
+import { useTreasury } from "@/lib/treasury-context";
 import { formatUSD } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
 import { BusyLabel, TxFeedback } from "./ui";
@@ -20,6 +19,7 @@ export function ShortfallAlert({
   protectedLiquidity,
   availableBalance,
   totalDeployed,
+  strategyLiquidity,
   decimals,
   isOwner,
   onChange,
@@ -27,10 +27,12 @@ export function ShortfallAlert({
   protectedLiquidity: bigint | undefined;
   availableBalance: bigint | undefined;
   totalDeployed: bigint | undefined;
+  strategyLiquidity: bigint | undefined;
   decimals: number;
   isOwner: boolean;
   onChange: () => void;
 }) {
+  const { treasury } = useTreasury();
   const recall = useTx(onChange);
 
   if (protectedLiquidity === undefined || availableBalance === undefined) {
@@ -43,14 +45,14 @@ export function ShortfallAlert({
       : 0n;
 
   const deployed = totalDeployed ?? 0n;
-  const recallable = deployed < shortfall ? deployed : shortfall;
+  const liquidInStrategy = strategyLiquidity ?? 0n;
+  const maxRecall = deployed < liquidInStrategy ? deployed : liquidInStrategy;
+  const recallable = maxRecall < shortfall ? maxRecall : shortfall;
+  const uncovered = shortfall - recallable;
 
-  // Only surface the alert when recalling deployed capital would actually help
-  // cover the deficit — otherwise the stats already tell the story and there is
-  // no action to offer (e.g. an empty vault whose reserve exceeds its balance).
-  if (recallable === 0n) return null;
+  if (shortfall === 0n) return null;
 
-  const canRecall = isOwner && Boolean(mockStrategyAddress);
+  const canRecall = isOwner && Boolean(treasury?.strategy);
   const busy = recall.isPending || recall.isConfirming;
 
   return (
@@ -61,20 +63,19 @@ export function ShortfallAlert({
             Liquidity shortfall
           </div>
           <p className="mt-1 text-xs text-amber-200/80">
-            Protected liquidity exceeds the idle balance by{" "}
-            {formatUSD(shortfall, decimals)}. Recall{" "}
-            {formatUSD(recallable, decimals)} from the strategy to cover
-            obligations.
+            Protected liquidity exceeds idle cash by {formatUSD(shortfall, decimals)}.
+            {recallable > 0n && <> Recall up to {formatUSD(recallable, decimals)} from the strategy.</>}
+            {uncovered > 0n && <> {formatUSD(uncovered, decimals)} remains uncovered after all currently liquid strategy funds are recalled. Add funds or reduce/cancel obligations.</>}
           </p>
         </div>
-        {canRecall && (
+        {canRecall && recallable > 0n && (
           <button
             onClick={() =>
               recall.writeContract({
-                address: treasuryVaultAddress!,
+                address: treasury!.vault,
                 abi: treasuryVaultAbi,
                 functionName: "recallFromStrategy",
-                args: [mockStrategyAddress!, recallable],
+                args: [treasury!.strategy!, recallable],
                 chainId: CHAIN_ID,
               })
             }
