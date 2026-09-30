@@ -13,7 +13,7 @@ import { BusyLabel, TxFeedback } from "./ui";
  * Testnet faucet — mints SolventUSD (SUSD) straight to the connected wallet via
  * the token's unrestricted `mint`, so anyone can fund themselves before
  * depositing. Only rendered for treasuries whose asset supports open minting
- * (i.e. SUSD / MockUSDC, not canonical Aave USDC — see Vault).
+ * (i.e. SUSD / mock assets, not canonical Aave USDC — see Vault).
  */
 export function FaucetCard({
   decimals,

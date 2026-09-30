@@ -1,10 +1,10 @@
 # Solvent implementation and release notes
 
-This release targets **Arbitrum Sepolia** and the MockUSDC address already configured by the operator. The TreasuryFactory has been deployed and its transaction receipt verified on-chain.
+This release targets **Arbitrum Sepolia** and the SolventUSD (SUSD) address already configured by the operator. The TreasuryFactory has been deployed and its transaction receipt verified on-chain.
 
 ## Implemented areas
 
-1. **Treasury creation and discovery** — `TreasuryFactory` deploys an atomically wired vault and obligation registry. For the official Aave V3 Arbitrum Sepolia USDC reserve it deploys `AaveV3UsdcStrategy`; for other tokens (including the operator's custom Mock USDC) it deploys the principal-only `MockStrategy`. The caller owns the vault and registry (a Safe can call it). Owners can connect an existing vault; the browser validates the vault/registry relationship and optional strategy wiring.
+1. **Treasury creation and discovery** — `TreasuryFactory` deploys an atomically wired vault and obligation registry. For the official Aave V3 Arbitrum Sepolia USDC reserve it deploys `AaveV3UsdcStrategy`; for other tokens (including the operator's Solvent USD, SUSD) it deploys the principal-only `MockStrategy`. The caller owns the vault and registry (a Safe can call it). Owners can connect an existing vault; the browser validates the vault/registry relationship and optional strategy wiring.
 2. **Team approvals** — the frontend supports the Safe web app connector. When treasury creation runs from a Safe, that Safe is the onchain owner and Safe’s configured threshold applies to owner actions. Existing EOA-owned deployments need their ownership transferred to a Safe separately. The current standalone keeper signs as an EOA and cannot execute Safe-owned actions.
 3. **Persistent alerts and keeper health** — SQLite stores alert records and keeper heartbeats. The keeper can post authenticated status to `/api/keeper/heartbeat`; the dashboard reads the last heartbeat. Set a randomly generated `KEEPER_HEARTBEAT_TOKEN` of at least 24 characters in both processes.
 4. **Activity indexing** — `npm run indexer` scans Arbitrum Sepolia events in bounded 2,000-block ranges, persists checkpoints, and serves the latest 50 events from the local API. Factory-created treasuries are discovered from the factory event; the existing `.env` treasury remains supported.
@@ -13,7 +13,7 @@ This release targets **Arbitrum Sepolia** and the MockUSDC address already confi
 
 ## Operator setup
 
-1. Set `NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC`, MockUSDC, and the existing vault, registry, and strategy addresses as they are currently configured.
+1. Set `NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC`, the SolventUSD (SUSD) token, and the existing vault, registry, and strategy addresses as they are currently configured.
 2. The factory is already deployed on Arbitrum Sepolia:
 
    - Address: `0x4f1294169e835402541ef58bBc332AF3Dd92EDeA`
