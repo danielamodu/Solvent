@@ -5,16 +5,16 @@ import "forge-std/Test.sol";
 import {TreasuryFactory} from "../src/TreasuryFactory.sol";
 import {TreasuryVault} from "../src/TreasuryVault.sol";
 import {ObligationRegistry} from "../src/ObligationRegistry.sol";
-import {MockUSDC} from "../src/MockUSDC.sol";
+import {SolventUSD} from "../src/SolventUSD.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
 
 contract TreasuryFactoryTest is Test {
     TreasuryFactory internal factory;
-    MockUSDC internal usdc;
+    SolventUSD internal usdc;
 
     function setUp() public {
         factory = new TreasuryFactory();
-        usdc = new MockUSDC();
+        usdc = new SolventUSD();
     }
 
     function test_createTreasury_wiresBothContractsAndIndexesOwner() public {

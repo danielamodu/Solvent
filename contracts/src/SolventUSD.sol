@@ -3,14 +3,14 @@ pragma solidity ^0.8.20;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-/// @title MockUSDC
-/// @notice A 6-decimal ERC-20 stand-in for USDC with an open, unrestricted
-///         `mint` so the full treasury loop can be exercised on testnet without
-///         Circle's rate-limited faucet.
+/// @title SolventUSD
+/// @notice A 6-decimal ERC-20 stand-in for USDC ("Solvent USD", SUSD) with an
+///         open, unrestricted `mint` faucet so the full treasury loop can be
+///         exercised on testnet without Circle's rate-limited faucet.
 /// @dev TESTNET ONLY. `mint` intentionally has no access control — anyone can
 ///      fund themselves for demos. Never deploy this to a production network.
-contract MockUSDC is ERC20 {
-    constructor() ERC20("Mock USD Coin", "USDC") {}
+contract SolventUSD is ERC20 {
+    constructor() ERC20("Solvent USD", "SUSD") {}
 
     /// @notice Decimals match Circle USDC (6), not the ERC-20 default of 18.
     function decimals() public pure override returns (uint8) {

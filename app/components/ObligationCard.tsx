@@ -23,6 +23,7 @@ const PRIORITY_OPTIONS = [
 
 export function ObligationCard({
   decimals,
+  symbol = "SUSD",
   availableBalance,
   isOwner,
   obligations,
@@ -32,6 +33,7 @@ export function ObligationCard({
   disabledReason,
 }: {
   decimals: number;
+  symbol?: string;
   availableBalance?: bigint;
   isOwner: boolean;
   obligations: ObligationRecord[];
@@ -139,7 +141,7 @@ export function ObligationCard({
         <input
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          placeholder="Amount (USDC)"
+          placeholder={`Amount (${symbol})`}
           inputMode="decimal"
           disabled={locked}
           title={hint}
