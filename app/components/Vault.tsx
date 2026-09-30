@@ -11,11 +11,13 @@ import {
   treasuryFactoryAbi,
   treasuryFactoryAddress,
   treasuryVaultAbi,
+  AAVE_SEPOLIA_USDC,
 } from "@/lib/contracts";
 import { formatUSD, shortenAddress } from "@/lib/format";
 import { useObligations } from "@/lib/useObligations";
 import { useTreasury } from "@/lib/treasury-context";
 import { DepositCard } from "./DepositCard";
+import { FaucetCard } from "./FaucetCard";
 import { LiquidityTimeline } from "./LiquidityTimeline";
 import { ObligationCard } from "./ObligationCard";
 import { ShortfallAlert } from "./ShortfallAlert";
@@ -82,6 +84,13 @@ export function Vault() {
     chainId: CHAIN_ID,
     query: { enabled: configured },
   });
+  const symbolRead = useReadContract({
+    address: treasury?.asset,
+    abi: erc20Abi,
+    functionName: "symbol",
+    chainId: CHAIN_ID,
+    query: { enabled: configured },
+  });
   const outstanding = useReadContract({
     address: treasury?.registry,
     abi: OBLIGATION_REGISTRY_ABI,
@@ -105,6 +114,12 @@ export function Vault() {
   });
 
   const decimals = decimalsRead.data ?? 6;
+  const symbol = symbolRead.data ?? "SUSD";
+  // The faucet mints via the token's open `mint`. Canonical Aave USDC has no
+  // such mint, so only offer it for SUSD / mock assets.
+  const mintableAsset =
+    Boolean(treasury?.asset) &&
+    treasury!.asset.toLowerCase() !== AAVE_SEPOLIA_USDC.toLowerCase();
   const isOwner =
     Boolean(address) &&
     typeof ownerRead.data === "string" &&
@@ -256,6 +271,7 @@ export function Vault() {
       {treasury?.registry && (
         <ObligationCard
           decimals={decimals}
+          symbol={symbol}
           availableBalance={available.data}
           isOwner={isOwner}
           obligations={obligations}
@@ -266,14 +282,24 @@ export function Vault() {
         />
       )}
       <div className="grid gap-4 sm:grid-cols-2">
+        {mintableAsset && (
+          <FaucetCard
+            decimals={decimals}
+            onChange={refresh}
+            disabled={!canInteract}
+            disabledReason={interactionHint}
+          />
+        )}
         <DepositCard
           decimals={decimals}
+          symbol={symbol}
           onChange={refresh}
           disabled={!canInteract}
           disabledReason={interactionHint}
         />
         <WithdrawCard
           decimals={decimals}
+          symbol={symbol}
           isOwner={isOwner}
           onChange={refresh}
           disabled={!canInteract}

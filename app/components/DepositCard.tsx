@@ -15,11 +15,13 @@ import { BusyLabel, TxFeedback } from "./ui";
 
 export function DepositCard({
   decimals,
+  symbol = "SUSD",
   onChange,
   disabled = false,
   disabledReason,
 }: {
   decimals: number;
+  symbol?: string;
   onChange: () => void;
   disabled?: boolean;
   disabledReason?: string;
@@ -78,7 +80,7 @@ export function DepositCard({
 
   return (
     <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <h2 className="text-sm font-medium text-neutral-200">Deposit USDC</h2>
+      <h2 className="text-sm font-medium text-neutral-200">Deposit {symbol}</h2>
       <p className="mt-1 text-xs text-neutral-500">
         Wallet: {formatUSD(balance.data, decimals)}
       </p>
@@ -113,12 +115,12 @@ export function DepositCard({
                 ? "Confirm in wallet…"
                 : approve.isConfirming
                   ? "Approving…"
-                  : "Approve USDC"}
+                  : `Approve ${symbol}`}
             </BusyLabel>
           </button>
           {!insufficientBalance && parsed !== null && (
             <p className="mt-2 text-[11px] text-neutral-500">
-              One-time approval so the vault can pull your USDC, then deposit.
+              One-time approval so the vault can pull your {symbol}, then deposit.
             </p>
           )}
         </>

@@ -3,7 +3,7 @@
  * judge-ready state on Arbitrum Sepolia. NOT part of the Next.js app.
  *
  * Produces:
- *   - 500,000 USDC deposited            (dashboard "Total assets" -> $500,000)
+ *   - 500,000 SUSD deposited            (dashboard "Total assets" -> $500,000)
  *   - 3 pending obligations             (Supplier $40k/5d HIGH, Payroll
  *                                        $75k/8d HIGH, Investor $30k/15d MED)
  *   - all deployable surplus deployed   (dashboard "Deployable" -> $0)
@@ -13,8 +13,8 @@
  * -> Recall covers it -> settle.
  *
  * The signer must be the vault owner (createObligation / deployToStrategy are
- * owner-only). USDC is minted to the owner first via MockUSDC.mint — TESTNET
- * ONLY; MockUSDC has an unrestricted mint by design.
+ * owner-only). SUSD is minted to the owner first via SolventUSD.mint — TESTNET
+ * ONLY; SolventUSD has an unrestricted mint by design.
  *
  * Run:   cd keeper && npx ts-node ../scripts/seed-demo.ts
  * Env (read from ../.env): NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC,
@@ -49,7 +49,7 @@ const ENV_PATH = [
 ].find((p) => existsSync(p));
 if (ENV_PATH) loadEnv({ path: ENV_PATH });
 
-const DECIMALS = 6; // USDC / MockUSDC are 6-decimal.
+const DECIMALS = 6; // SUSD / USDC are 6-decimal.
 const DAY = 86_400;
 
 function requireEnv(name: string): string {
@@ -216,7 +216,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  // 1) Fund the owner with USDC to deposit (MockUSDC mint — testnet only).
+  // 1) Fund the owner with SUSD to deposit (SolventUSD mint — testnet only).
   const balance = (await publicClient.readContract({
     address: USDC,
     abi: usdcAbi,

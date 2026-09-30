@@ -13,12 +13,14 @@ import { BusyLabel, TxFeedback } from "./ui";
 
 export function WithdrawCard({
   decimals,
+  symbol = "SUSD",
   isOwner,
   onChange,
   disabled = false,
   disabledReason,
 }: {
   decimals: number;
+  symbol?: string;
   isOwner: boolean;
   onChange: () => void;
   disabled?: boolean;
@@ -47,7 +49,7 @@ export function WithdrawCard({
 
   return (
     <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <h2 className="text-sm font-medium text-neutral-200">Withdraw USDC</h2>
+      <h2 className="text-sm font-medium text-neutral-200">Withdraw {symbol}</h2>
       <p className="mt-1 text-xs text-neutral-500">
         {isOwner ? "Owner only — funds leave the vault." : "Only the vault owner can withdraw."}
       </p>

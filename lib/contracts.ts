@@ -6,6 +6,26 @@ export { erc20Abi };
 /** Target network for all vault reads/writes (Arbitrum Sepolia). */
 export const CHAIN_ID = arbitrumSepolia.id;
 
+/** Canonical Aave-faucet USDC on Arbitrum Sepolia. Real USDC — no open mint,
+ *  so the SUSD faucet is hidden for treasuries whose asset is this token. */
+export const AAVE_SEPOLIA_USDC =
+  "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d" as const;
+
+/** SolventUSD (SUSD) exposes an unrestricted `mint` — the testnet faucet the
+ *  UI calls so anyone can fund themselves. viem's `erc20Abi` omits `mint`. */
+export const susdFaucetAbi = [
+  {
+    type: "function",
+    name: "mint",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "to", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [],
+  },
+] as const;
+
 /** Factory deployed once per network; each team discovers treasuries by owner. */
 export const treasuryFactoryAbi = [
   {
