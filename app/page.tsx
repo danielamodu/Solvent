@@ -1,43 +1,86 @@
 import Link from "next/link";
 import { SolventFooter, SolventNav } from "./components/SolventNav";
 
-const features = [
-  { number: "01", title: "Track obligations", text: "Record payment commitments onchain and see what is due before treasury funds are deployed." },
-  { number: "02", title: "Protect payments", text: "Reserve requirements and pending obligations reduce the amount available for strategy deployment." },
-  { number: "03", title: "Deploy with guardrails", text: "The vault enforces the deployable limit. Recall strategy principal before paying when idle liquidity is short." },
+const principles = [
+  { index: "01", title: "Record the promise", copy: "Put payment commitments onchain before treasury funds are put to work." },
+  { index: "02", title: "Keep it protected", copy: "The registry reserves the required liquidity and counts pending obligations against deployable capital." },
+  { index: "03", title: "Move with context", copy: "Review idle funds, strategy positions, and upcoming payments from one treasury view." },
 ];
 
 export default function Home() {
-  return <main className="min-h-screen bg-white text-slate-900">
-    <SolventNav marketing />
-    <section className="relative overflow-hidden border-b border-blue-900/5 bg-gradient-to-b from-blue-700 via-blue-600 to-white">
-      <div className="mx-auto grid min-h-[590px] max-w-[1280px] items-center gap-12 px-5 py-20 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-24">
-        <div className="relative z-10 max-w-3xl text-white">
-          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-semibold tracking-wide text-white"><span className="h-2 w-2 rounded-full bg-white" /> ONCHAIN TREASURY MANAGEMENT</div>
-          <h1 className="display-font text-5xl font-extrabold leading-[1.02] sm:text-6xl lg:text-[72px]">Know what you owe.<br />Deploy what you can.</h1>
-          <p className="mt-6 max-w-xl text-base leading-7 text-blue-50 sm:text-lg">Solvent makes payment commitments visible before capital moves, so your team can protect what is promised and act on what is free.</p>
-          <div className="mt-9 flex flex-wrap gap-3">
-            <Link href="/connect" className="rounded-full bg-white px-7 py-4 text-sm font-bold text-blue-700 shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl">Connect wallet <span aria-hidden>→</span></Link>
-            <Link href="/dashboard" className="rounded-full border border-white/50 px-7 py-4 text-sm font-semibold text-white transition hover:bg-white/10">Open dashboard</Link>
+  return (
+    <main className="marketing-page">
+      <SolventNav marketing />
+      <section className="marketing-hero">
+        <div className="hero-grid-texture" aria-hidden="true" />
+        <div className="marketing-hero-inner">
+          <div className="hero-copy">
+            <p className="eyebrow"><span className="eyebrow-line" /> Onchain treasury management</p>
+            <h1>Know what you owe.<br /><em>Move what is free.</em></h1>
+            <p className="hero-description">Solvent gives teams a clear view of payment commitments, protected liquidity, and capital available to deploy.</p>
+            <div className="hero-actions">
+              <Link href="/connect" className="button button-lime">Connect a treasury <span aria-hidden="true">↗</span></Link>
+              <Link href="/dashboard" className="hero-text-link">Explore the app <span aria-hidden="true">→</span></Link>
+            </div>
+            <div className="hero-footnote"><span className="status-dot" /> Arbitrum Sepolia testnet <span className="footnote-divider">/</span> Owner controlled</div>
           </div>
-          <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 text-xs font-medium text-blue-50"><span>Arbitrum Sepolia</span><span>Onchain commitments</span><span>Owner-controlled actions</span></div>
-        </div>
-        <div className="relative mx-auto w-full max-w-[520px]">
-          <div className="absolute inset-8 rounded-full bg-blue-300/40 blur-3xl" />
-          <div className="relative rotate-1 rounded-[28px] border border-white/70 bg-white p-5 shadow-[0_28px_80px_rgba(17,24,39,.2)] sm:p-7">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-5"><div><p className="text-xs font-semibold uppercase tracking-[.16em] text-blue-700">Treasury overview</p><h2 className="mt-1 text-xl font-bold text-slate-900">Arbitrum Treasury</h2></div><span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">Protected</span></div>
-            <div className="grid grid-cols-2 gap-3 py-5"><div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs text-slate-500">Total assets</p><p className="mt-2 text-2xl font-bold text-slate-900">Onchain</p></div><div className="rounded-2xl bg-blue-50 p-4"><p className="text-xs text-blue-700">Deployable</p><p className="mt-2 text-2xl font-bold text-blue-800">Guarded</p></div></div>
-            <div className="rounded-2xl border border-slate-100 p-4"><div className="flex items-center justify-between"><span className="text-sm font-semibold">Payment readiness</span><span className="text-xs font-bold text-blue-700">Live</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full w-3/4 rounded-full bg-blue-700" /></div><div className="mt-4 space-y-3"><div className="flex items-center justify-between text-xs"><span className="text-slate-600">Pending obligations</span><span className="font-semibold text-slate-800">Tracked onchain</span></div><div className="flex items-center justify-between text-xs"><span className="text-slate-600">Strategy exposure</span><span className="font-semibold text-slate-800">Recallable principal</span></div></div></div>
-            <p className="mt-4 text-center text-[11px] text-slate-400">Illustrative dashboard preview · values load from your treasury</p>
+          <div className="hero-visual" aria-label="Illustrative treasury dashboard preview">
+            <div className="preview-orbit orbit-one" />
+            <div className="preview-orbit orbit-two" />
+            <div className="preview-window">
+              <div className="preview-topline"><span>WORKSPACE / TREASURY</span><span className="preview-live"><i /> CONNECTED</span></div>
+              <div className="preview-heading"><div><span className="preview-label">TREASURY OVERVIEW</span><h2>Operations vault</h2></div><span className="preview-chain">ARB / TESTNET</span></div>
+              <div className="preview-value-row"><div><span>Total assets</span><strong>Onchain</strong></div><div><span>Free to deploy</span><strong>Guarded</strong></div></div>
+              <div className="preview-allocation"><div className="allocation-heading"><span>Capital allocation</span><span>Live contract data</span></div><div className="allocation-bar"><i /><i /><i /><i /></div><div className="allocation-legend"><span><i /> Reserve</span><span><i /> Obligations</span><span><i /> Deployed</span><span><i /> Available</span></div></div>
+              <div className="preview-obligation"><div className="obligation-marker" /><div><span>NEXT COMMITMENT</span><strong>Payment readiness</strong></div><b>Review</b></div>
+              <div className="preview-bottom"><span>Data loads from your connected treasury</span><span className="preview-arrow">↗</span></div>
+            </div>
+            <div className="visual-caption"><span>01</span><span>Commitments first. Capital second.</span></div>
           </div>
         </div>
-      </div>
-    </section>
-    <section id="product" className="mx-auto max-w-[1280px] px-5 py-20 lg:px-8 lg:py-24">
-      <div className="max-w-2xl"><p className="text-xs font-bold uppercase tracking-[.2em] text-blue-700">Product capabilities</p><h2 className="display-font mt-3 text-4xl font-extrabold sm:text-5xl">Clarity for every dollar in motion.</h2><p className="mt-5 text-base leading-7 text-slate-600">A single treasury view connects payment commitments, protected liquidity, and strategy positions to the contracts that enforce them.</p></div>
-      <div id="how-it-works" className="mt-10 grid gap-5 md:grid-cols-3">{features.map(item => <article key={item.number} className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"><p className="text-sm font-bold text-blue-700">{item.number}</p><h3 className="mt-6 text-xl font-bold">{item.title}</h3><p className="mt-3 text-sm leading-6 text-slate-600">{item.text}</p></article>)}</div>
-      <div className="mt-12 flex flex-col justify-between gap-6 rounded-3xl bg-blue-700 p-8 text-white sm:flex-row sm:items-center sm:p-10"><div><p className="text-sm font-semibold text-blue-100">Get started with Solvent</p><h2 className="display-font mt-2 text-3xl font-extrabold">Make every payment feel planned.</h2></div><Link href="/connect" className="shrink-0 rounded-full bg-white px-7 py-4 text-sm font-bold text-blue-700 hover:bg-blue-50">Connect wallet today →</Link></div>
-    </section>
-    <SolventFooter marketing />
-  </main>;
+        <div className="hero-index"><span>01 — 03</span><span>SCROLL TO EXPLORE</span></div>
+      </section>
+
+      <section id="product" className="product-intro">
+        <div className="section-marker"><span>01</span><span>THE PRODUCT</span></div>
+        <div className="product-intro-grid"><h2>A treasury should know its obligations before it reaches for yield.</h2><p>Solvent connects payment records to vault liquidity, so a team can see what is committed, what is deployed, and what the contracts consider available.</p></div>
+        <div id="how-it-works" className="principle-list">
+          {principles.map((item) => <article className="principle-row" key={item.index}><span className="principle-index">{item.index}</span><h3>{item.title}</h3><p>{item.copy}</p><span className="principle-arrow" aria-hidden="true">↗</span></article>)}
+        </div>
+      </section>
+
+      <section className="capital-section">
+        <div className="capital-copy">
+          <div className="section-marker"><span>02</span><span>CAPITAL, MADE LEGIBLE</span></div>
+          <h2>Every asset has a job.</h2>
+          <p>Solvent separates the balances a treasury needs to honor from the capital it can put to work. The vault calculates deployable capital onchain after protected liquidity and existing strategy positions are accounted for.</p>
+          <Link href="/liquidity" className="section-link">Explore liquidity <span aria-hidden="true">↗</span></Link>
+        </div>
+        <div className="capital-visual" aria-label="Illustration of treasury capital categories">
+          <div className="capital-visual-head"><span>VAULT BALANCE</span><span>CONTRACT VIEW</span></div>
+          <div className="capital-flow"><div className="flow-total"><span>Total assets</span><b>From the vault</b></div><div className="flow-branches"><div><i className="flow-swatch reserve-swatch"/><span><b>Reserve</b><small>Required liquidity</small></span></div><div><i className="flow-swatch obligation-swatch"/><span><b>Obligations</b><small>Pending payments</small></span></div><div><i className="flow-swatch deployed-swatch"/><span><b>Deployed</b><small>Strategy position</small></span></div><div><i className="flow-swatch free-swatch"/><span><b>Deployable</b><small>Available by contract rule</small></span></div></div></div>
+          <p className="capital-footnote">Illustrative categories. Balances load from the selected treasury.</p>
+        </div>
+      </section>
+
+      <section className="workspace-section">
+        <div className="workspace-heading"><div><div className="section-marker"><span>03</span><span>FOUR VIEWS, ONE TREASURY</span></div><h2>From obligation to action.</h2></div><p>Each workspace view answers a different treasury question, with wallet actions available where the connected account has permission.</p></div>
+        <div className="workspace-grid">
+          <Link href="/dashboard" className="workspace-card overview-card"><span className="workspace-number">01 / OVERVIEW</span><h3>What is in the vault?</h3><p>Review total assets, protected liquidity, deployed funds, and current payment readiness.</p><span className="workspace-arrow">Open overview ↗</span></Link>
+          <Link href="/obligations" className="workspace-card"><span className="workspace-number">02 / OBLIGATIONS</span><h3>What is due?</h3><p>Record commitments, see upcoming due dates, and check how obligations affect protected capital.</p><span className="workspace-arrow">Review commitments ↗</span></Link>
+          <Link href="/liquidity" className="workspace-card"><span className="workspace-number">03 / LIQUIDITY</span><h3>What is available?</h3><p>Understand reserve requirements, pending obligations, idle balance, and strategy liquidity.</p><span className="workspace-arrow">Inspect liquidity ↗</span></Link>
+          <Link href="/deploy" className="workspace-card"><span className="workspace-number">04 / DEPLOYMENT</span><h3>What can move?</h3><p>Review the onchain deployment limit and use the connected strategy controls when permitted.</p><span className="workspace-arrow">View deployment ↗</span></Link>
+        </div>
+      </section>
+
+      <section className="setup-section">
+        <div className="section-marker"><span>04</span><span>GETTING STARTED</span></div>
+        <div className="setup-heading"><h2>Start with a treasury<br />you can verify.</h2><Link href="/connect" className="button button-dark">Connect a treasury <span aria-hidden="true">↗</span></Link></div>
+        <div className="setup-steps"><article><span>01</span><div><h3>Connect a wallet</h3><p>Use a wallet or Safe on Arbitrum Sepolia. Reads remain public, while owner actions require the correct account and network.</p></div></article><article><span>02</span><div><h3>Select or create a vault</h3><p>Connect an existing vault, or create a testnet treasury through the configured factory.</p></div></article><article><span>03</span><div><h3>Review before acting</h3><p>Check obligations and liquidity first. The vault enforces the deployable limit when strategy capital moves.</p></div></article></div>
+      </section>
+
+      <section className="marketing-close"><div className="section-marker"><span>05</span><span>START WITH THE TREASURY</span></div><div className="close-grid"><h2>See the whole picture<br /><em>before capital moves.</em></h2><div><p>Connect a treasury to review its onchain balances and commitments. Owner actions stay gated by the connected wallet and the contracts.</p><Link href="/connect" className="button button-dark">Open Solvent <span aria-hidden="true">↗</span></Link></div></div><div className="testnet-note"><span>TESTNET ENVIRONMENT</span><p>Solvent currently runs on Arbitrum Sepolia. Test tokens and mock strategy positions have no real-world value.</p></div></section>
+      <SolventFooter marketing />
+    </main>
+  );
 }

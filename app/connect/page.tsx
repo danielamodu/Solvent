@@ -24,7 +24,7 @@ export default function ConnectPage() {
 
   return <main className="min-h-screen bg-white text-slate-900">
     <SolventNav />
-    <section className="mx-auto max-w-[1280px] px-5 py-14 lg:px-8 lg:py-20">
+    <section className="solvent-dashboard mx-auto max-w-[1280px] px-5 py-14 lg:px-8 lg:py-20">
       <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[.88fr_1.12fr]">
         <div className="flex flex-col justify-center">
           <p className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-700/15 px-3 py-2 text-xs font-bold text-slate-600"><span className="h-2 w-2 rounded-full bg-blue-700" /> VERIFY ONCHAIN CREDENTIALS</p>
