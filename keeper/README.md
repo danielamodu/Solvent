@@ -17,7 +17,10 @@ Everything else it leaves alone.
 
 Every `KEEPER_INTERVAL_MS` (default 60s), and once immediately on start:
 
-1. Read live state: `totalAssets`, `availableBalance`, `protectedLiquidity`,
+1. Discover treasuries: `getTreasuries(owner)` on the factory (owner defaults
+   to the signer, override with `KEEPER_OWNER_ADDRESS`), resolving each
+   vault's registry/strategy on-chain, plus the legacy treasury when configured.
+2. Per treasury, read live state: `totalAssets`, `availableBalance`, `protectedLiquidity`,
    the vault's `strategyPositions[strategy]`, and the strategy's
    `availableLiquidity`.
 2. Load every obligation (event-sourced from `ObligationCreated`, same as the
@@ -41,6 +44,12 @@ Every `KEEPER_INTERVAL_MS` (default 60s), and once immediately on start:
 
 Every write is **simulated first**, so reverts are caught before gas is spent.
 
+A vault whose owner is not the keeper signer (e.g. Safe-owned) is reported
+but skipped for writes — the keeper logs a warning per tick instead of
+spamming reverts. For Safe-owned treasuries, either run the keeper with a
+signer the vault accepts or propose the keeper's calldata through the Safe
+(signatures remain human-approved).
+
 ## Configuration
 
 Reads the project's root `.env` (one level up — `../.env`). No separate env
@@ -49,15 +58,18 @@ file. Required:
 | Variable | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC` | RPC endpoint |
-| `NEXT_PUBLIC_TREASURY_VAULT_ADDRESS` | TreasuryVault |
-| `NEXT_PUBLIC_OBLIGATION_REGISTRY_ADDRESS` | ObligationRegistry |
-| `NEXT_PUBLIC_MOCK_STRATEGY_ADDRESS` | Strategy to recall from |
+| `NEXT_PUBLIC_TREASURY_FACTORY_ADDRESS` | Factory for multi-treasury discovery (preferred) |
+| `NEXT_PUBLIC_TREASURY_VAULT_ADDRESS` | Legacy single treasury — merged in when all three legacy addresses are set |
+| `NEXT_PUBLIC_OBLIGATION_REGISTRY_ADDRESS` | Legacy single treasury registry |
+| `NEXT_PUBLIC_MOCK_STRATEGY_ADDRESS` | Legacy single treasury strategy |
 | `PRIVATE_KEY` | Owner key — the keeper signs as the vault/registry owner |
 
 Optional:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
+| `KEEPER_OWNER_ADDRESS` | signer address | Treasury owner to watch on the factory |
+| `NEXT_PUBLIC_TREASURY_FACTORY_DEPLOY_BLOCK` | `0` | First block to scan (factory creation scans fall back to `NEXT_PUBLIC_OBLIGATION_REGISTRY_DEPLOY_BLOCK`) |
 | `KEEPER_INTERVAL_MS` | `60000` | Tick interval |
 | `KEEPER_DRY_RUN` | `false` | Decide and log, but send **no** transactions |
 | `KEEPER_ONCE` | `false` | Run a single tick, then exit |
