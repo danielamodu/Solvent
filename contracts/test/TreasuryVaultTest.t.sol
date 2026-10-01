@@ -48,6 +48,7 @@ contract TreasuryVaultTest is Test {
         registry = new ObligationRegistry(owner, RESERVE, address(vault));
         require(address(registry) == predictedRegistry, "registry address prediction mismatch");
         strategy = new MockStrategy(address(vault), address(usdc));
+        vault.authorizeStrategy(address(strategy));
 
         usdc.mint(depositor, 1_000e6);
         vm.prank(depositor);
@@ -261,5 +262,38 @@ contract TreasuryVaultTest is Test {
 
         // 8. only the $50k urgent obligation remains outstanding
         assertEq(registry.getOutstandingAmount(), 50e6);
+    }
+
+    // ── strategy authorization ────────────────────────────────────────
+
+    function test_deploy_reverts_if_strategy_not_authorized() public {
+        _deposit(500e6);
+        vm.expectRevert("TreasuryVault: strategy not authorized");
+        vault.deployToStrategy(makeAddr("rogue-strategy"), 10e6);
+    }
+
+    function test_recall_reverts_if_strategy_not_authorized() public {
+        vm.expectRevert("TreasuryVault: strategy not authorized");
+        vault.recallFromStrategy(makeAddr("rogue-strategy"), 10e6);
+    }
+
+    function test_harvest_reverts_if_strategy_not_authorized() public {
+        vm.expectRevert("TreasuryVault: strategy not authorized");
+        vault.harvestStrategyYield(makeAddr("rogue-strategy"));
+    }
+
+    function test_authorize_and_revoke_strategy() public {
+        address rogue = makeAddr("rogue-strategy");
+        assertFalse(vault.authorizedStrategies(rogue));
+        vault.authorizeStrategy(rogue);
+        assertTrue(vault.authorizedStrategies(rogue));
+        vault.revokeStrategy(rogue);
+        assertFalse(vault.authorizedStrategies(rogue));
+    }
+
+    function test_authorize_reverts_if_caller_not_owner() public {
+        vm.prank(stranger);
+        vm.expectRevert();
+        vault.authorizeStrategy(address(strategy));
     }
 }

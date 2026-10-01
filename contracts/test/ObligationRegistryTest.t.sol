@@ -62,7 +62,8 @@ contract ObligationRegistryTest is Test {
     }
 
     /// @dev Creates a PENDING obligation with fixed beneficiary/dueAt/priority.
-    ///      Distinct `amount`s yield distinct ids within a single test.
+    ///      Ids are unique per create (registry nonce), so callers never need
+    ///      to vary the inputs to avoid collisions.
     function _create(uint256 amount) internal returns (bytes32) {
         return registry.createObligation(
             beneficiary,
@@ -191,5 +192,16 @@ contract ObligationRegistryTest is Test {
         assertEq(poorRegistry.getOutstandingAmount(), 100_000e6);
         ( , , , , , IObligationRegistry.Status status) = poorRegistry.obligations(id);
         assertEq(uint256(status), uint256(IObligationRegistry.Status.PENDING));
+    }
+
+    function test_identical_creates_in_same_block_get_distinct_ids() public {
+        bytes32 first = registry.createObligation(
+            beneficiary, 10e6, block.timestamp + 30 days, IObligationRegistry.Priority.MEDIUM
+        );
+        bytes32 second = registry.createObligation(
+            beneficiary, 10e6, block.timestamp + 30 days, IObligationRegistry.Priority.MEDIUM
+        );
+        assertTrue(first != second);
+        assertEq(registry.getOutstandingAmount(), 20e6);
     }
 }

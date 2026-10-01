@@ -42,6 +42,9 @@ contract TreasuryFactory {
             strategyAddress_ = address(new MockStrategy(address(vault), asset));
         }
         vault.setObligationRegistry(address(registry));
+        // The factory-created strategy is trusted from birth; the owner can
+        // authorize replacements or revoke via the vault at any time.
+        vault.authorizeStrategy(strategyAddress_);
 
         vault.transferOwnership(msg.sender);
         registry.transferOwnership(msg.sender);

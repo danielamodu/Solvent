@@ -30,6 +30,14 @@ contract TreasuryVault is ITreasuryVault, Ownable {
     /// @notice Principal currently deployed to each strategy adapter.
     mapping(address => uint256) public strategyPositions;
 
+    /// @notice Strategies the owner has approved for deploy/recall/harvest.
+    /// @dev A compromised or mistaken strategy address can trap funds or —
+    ///      via a lying `harvestYield` — inflate `totalAssets` without backing,
+    ///      so every strategy entrypoint requires explicit authorization. The
+    ///      factory authorizes the strategy it creates during setup; the owner
+    ///      can authorize replacements and revoke anything at any time.
+    mapping(address => bool) public authorizedStrategies;
+
     /// @notice Sum of all strategy positions — principal currently out on deployment.
     uint256 public totalDeployed;
 
@@ -39,6 +47,8 @@ contract TreasuryVault is ITreasuryVault, Ownable {
 
     event ObligationRegistryConfigured(address indexed registry);
     event StrategyYieldHarvested(address indexed strategy, uint256 amount);
+    event StrategyAuthorized(address indexed strategy);
+    event StrategyRevoked(address indexed strategy);
 
     constructor(address asset_, address initialOwner, address obligationRegistry_) Ownable(initialOwner) {
         require(asset_ != address(0), "TreasuryVault: asset is zero address");
@@ -52,6 +62,26 @@ contract TreasuryVault is ITreasuryVault, Ownable {
         require(registry_ != address(0), "TreasuryVault: registry is zero address");
         obligationRegistry = registry_;
         emit ObligationRegistryConfigured(registry_);
+    }
+
+    /// @notice Approve a strategy adapter for deploy/recall/harvest.
+    function authorizeStrategy(address strategy) external onlyOwner {
+        require(strategy != address(0), "TreasuryVault: strategy is zero address");
+        authorizedStrategies[strategy] = true;
+        emit StrategyAuthorized(strategy);
+    }
+
+    /// @notice Remove a strategy adapter's approval. Existing recorded
+    ///         positions stay intact and must be recalled via an authorized
+    ///         path — revocation stops new flows, it does not move funds.
+    function revokeStrategy(address strategy) external onlyOwner {
+        authorizedStrategies[strategy] = false;
+        emit StrategyRevoked(strategy);
+    }
+
+    modifier onlyAuthorizedStrategy(address strategy) {
+        require(authorizedStrategies[strategy], "TreasuryVault: strategy not authorized");
+        _;
     }
 
     /// @inheritdoc ITreasuryVault
@@ -108,7 +138,7 @@ contract TreasuryVault is ITreasuryVault, Ownable {
     ///         invariant that promised or already-deployed capital is never used.
     /// @dev Assets remain treasury-owned; only `strategyPositions`/`totalDeployed`
     ///      move. Effects precede the external adapter call (checks-effects-interactions).
-    function deployToStrategy(address strategy, uint256 amount) external onlyOwner {
+    function deployToStrategy(address strategy, uint256 amount) external onlyOwner onlyAuthorizedStrategy(strategy) {
         require(strategy != address(0), "TreasuryVault: strategy is zero address");
         require(amount <= deployableCapital(), "Insufficient deployable capital");
 
@@ -124,7 +154,7 @@ contract TreasuryVault is ITreasuryVault, Ownable {
     /// @notice Pull deployed capital back from a strategy into the vault.
     /// @dev Restores idle balance; `totalAssets` is unchanged (capital was always
     ///      treasury-owned). Effects precede the external adapter call.
-    function recallFromStrategy(address strategy, uint256 amount) external onlyOwner {
+    function recallFromStrategy(address strategy, uint256 amount) external onlyOwner onlyAuthorizedStrategy(strategy) {
         require(strategyPositions[strategy] >= amount, "TreasuryVault: recall exceeds position");
 
         strategyPositions[strategy] -= amount;
@@ -137,7 +167,7 @@ contract TreasuryVault is ITreasuryVault, Ownable {
 
     /// @notice Claim strategy yield into idle vault liquidity without changing
     ///         the strategy's recorded principal position.
-    function harvestStrategyYield(address strategy) external onlyOwner returns (uint256 amount) {
+    function harvestStrategyYield(address strategy) external onlyOwner onlyAuthorizedStrategy(strategy) returns (uint256 amount) {
         require(strategy != address(0), "TreasuryVault: strategy is zero address");
         amount = IStrategyAdapter(strategy).harvestYield();
         _totalAssets += amount;

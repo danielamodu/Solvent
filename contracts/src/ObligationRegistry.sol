@@ -39,6 +39,10 @@ contract ObligationRegistry is IObligationRegistry, Ownable {
     /// @dev Running sum of all PENDING obligation amounts. See contract notes.
     uint256 private _outstandingAmount;
 
+    /// @dev Monotonic nonce mixed into obligation ids so two identical creates
+    ///      (same beneficiary/amount/dueAt in the same block) never collide.
+    uint256 private _nonce;
+
     event VaultConfigured(address indexed vault);
 
     constructor(address initialOwner, uint256 reserveRequirement_, address vault_) Ownable(initialOwner) {
@@ -64,7 +68,7 @@ contract ObligationRegistry is IObligationRegistry, Ownable {
         require(beneficiary != address(0), "ObligationRegistry: beneficiary is zero address");
         require(amount > 0, "ObligationRegistry: amount is zero");
 
-        id = keccak256(abi.encodePacked(msg.sender, beneficiary, amount, dueAt, block.timestamp));
+        id = keccak256(abi.encodePacked(address(this), msg.sender, beneficiary, amount, dueAt, _nonce++));
         require(obligations[id].id == bytes32(0), "ObligationRegistry: obligation exists");
 
         obligations[id] = Obligation({
