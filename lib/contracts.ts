@@ -397,3 +397,16 @@ export const obligationRegistryDeployBlock: bigint = (() => {
     return 0n;
   }
 })();
+
+/** Block the current factory was deployed at. The obligation-log scan floor
+ *  must be the minimum of the configured blocks: factory treasuries are newer
+ *  than the factory, but the legacy registry predates it — using only one
+ *  value would blind the scan to the older side. */
+export const treasuryFactoryDeployBlock: bigint = (() => {
+  const raw = process.env.NEXT_PUBLIC_TREASURY_FACTORY_DEPLOY_BLOCK;
+  try {
+    return raw ? BigInt(raw) : 0n;
+  } catch {
+    return 0n;
+  }
+})();

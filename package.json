@@ -10,27 +10,31 @@
     "indexer": "node --experimental-strip-types scripts/indexer.ts",
     "release-check": "node --experimental-strip-types scripts/release-check.ts"
   },
-  "engines": { "node": ">=22.13" },
+  "engines": {
+    "node": ">=22.13"
+  },
   "dependencies": {
     "@safe-global/safe-apps-provider": "^0.18.6",
     "@safe-global/safe-apps-sdk": "^9.1.0",
+    "@tanstack/react-query": "^5.59.0",
+    "connectkit": "^1.8.2",
     "next": "14.2.15",
+    "pg": "^8.23.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "wagmi": "^2.12.17",
     "viem": "^2.21.19",
-    "connectkit": "^1.8.2",
-    "@tanstack/react-query": "^5.59.0"
+    "wagmi": "^2.12.17"
   },
   "devDependencies": {
-    "typescript": "^5.6.3",
     "@types/node": "^20.16.11",
+    "@types/pg": "^8.23.1",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
-    "tailwindcss": "^3.4.13",
-    "postcss": "^8.4.47",
     "autoprefixer": "^10.4.20",
     "dotenv": "^16.4.5",
-    "ts-node": "^10.9.2"
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   }
 }

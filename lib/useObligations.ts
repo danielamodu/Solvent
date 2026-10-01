@@ -6,6 +6,7 @@ import {
   CHAIN_ID,
   OBLIGATION_REGISTRY_ABI,
   obligationRegistryDeployBlock,
+  treasuryFactoryDeployBlock,
 } from "@/lib/contracts";
 import { useTreasury } from "./treasury-context";
 
@@ -33,11 +34,16 @@ export function useObligations() {
     if (!publicClient || !treasury?.registry) return;
     setLoading(true);
     try {
+      // Scan floor is the minimum of the configured blocks: the legacy
+      // registry predates the current factory, so either value alone would
+      // blind the scan to the older side. Unset values (0n) are ignored.
+      const floors = [obligationRegistryDeployBlock, treasuryFactoryDeployBlock].filter((b) => b > 0n);
+      const fromBlock = floors.length ? floors.reduce((a, b) => (a < b ? a : b)) : 0n;
       const logs = await publicClient.getContractEvents({
         address: treasury.registry,
         abi: OBLIGATION_REGISTRY_ABI,
         eventName: "ObligationCreated",
-        fromBlock: obligationRegistryDeployBlock,
+        fromBlock,
         toBlock: "latest",
       });
 

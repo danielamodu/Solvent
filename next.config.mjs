@@ -5,6 +5,12 @@ const nextConfig = {
     // No ESLint config in this foundation phase; don't fail the build on lint.
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    // `pg` is imported by the server-side storage layer
+    // (lib/server/pgstore.ts), used only when SOLVENT_DATABASE_URL is set.
+    // Keep it external so webpack never tries to bundle the driver.
+    serverComponentsExternalPackages: ["pg"],
+  },
   webpack: (config, { webpack }) => {
     // Silence optional peer deps pulled in transitively by wagmi/viem.
     config.externals.push("pino-pretty", "lokijs", "encoding");

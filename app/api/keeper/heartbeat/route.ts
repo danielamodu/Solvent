@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAddress, isAddress } from "viem";
-import { getStore } from "@/lib/server/store";
+import { saveHeartbeat } from "@/lib/server/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,11 +23,13 @@ export async function POST(request: Request) {
   if (body.state !== "healthy" && body.state !== "degraded") return NextResponse.json({ error: "Invalid keeper state." }, { status: 400 });
   const vault = getAddress(body.vault).toLowerCase();
   const bounded = (value: unknown, limit: number) => typeof value === "string" ? value.slice(0, limit) : null;
-  getStore().prepare(`
-    INSERT INTO keeper_status(vault,last_heartbeat,state,last_action,last_tx,last_error)
-    VALUES(?,?,?,?,?,?)
-    ON CONFLICT(vault) DO UPDATE SET last_heartbeat=excluded.last_heartbeat,
-      state=excluded.state,last_action=excluded.last_action,last_tx=excluded.last_tx,last_error=excluded.last_error
-  `).run(vault, Date.now(), body.state, bounded(body.lastAction, 160), bounded(body.lastTx, 80), bounded(body.lastError, 300));
+  const ok = await saveHeartbeat({
+    vault,
+    state: body.state,
+    lastAction: bounded(body.lastAction, 160),
+    lastTx: bounded(body.lastTx, 80),
+    lastError: bounded(body.lastError, 300),
+  });
+  if (!ok) return NextResponse.json({ error: "Storage offline." }, { status: 503 });
   return NextResponse.json({ ok: true });
 }

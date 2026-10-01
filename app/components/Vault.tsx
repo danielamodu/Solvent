@@ -365,8 +365,8 @@ function Stat({
   );
 }
 
-// Static placeholder — the keeper is a standalone off-chain process (see
-// /keeper), not wired to the app yet. Shows judges the automation exists.
+// The keeper is a standalone off-chain process (see /keeper) whose per-vault
+// heartbeats are served by /api/treasuries/[vault]/keeper and rendered here.
 function KeeperStatus({ vault }: { vault: `0x${string}` }) {
   const [status, setStatus] = useState<{ lastHeartbeat: number; state: string; lastAction: string | null; lastError: string | null } | null>(null);
   const [loaded, setLoaded] = useState(false);

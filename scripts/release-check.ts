@@ -14,6 +14,9 @@ const OBLIGATION_REGISTRY_ABI = [{ type: "function", name: "vault", stateMutabil
 
 const failures: string[] = [];
 if (!treasuryFactoryAddress) failures.push("NEXT_PUBLIC_TREASURY_FACTORY_ADDRESS is missing or malformed");
+/** Official Aave V3 Arbitrum Sepolia USDC reserve — the factory must expose
+ *  this constant to route Aave-backed treasuries; a pre-Aave factory reverts. */
+const EXPECTED_AAVE_SEPOLIA_USDC = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d";
 function requiredAddress(key: string): `0x${string}` | undefined {
   const value = process.env[key];
   if (!value || !isAddress(value)) { failures.push(`${key} is missing or malformed`); return undefined; }
@@ -66,6 +69,20 @@ async function main() {
       if (vault && strategyVault.toLowerCase() !== vault.toLowerCase()) failures.push("strategy.vault does not match configured vault");
       if (asset && strategyAsset.toLowerCase() !== asset.toLowerCase()) failures.push("strategy.asset does not match configured token");
     } catch (error) { failures.push(`strategy read failed: ${error instanceof Error ? error.message : String(error)}`); }
+  }
+  if (factory) {
+    try {
+      const aaveUsdc = await client.readContract({
+        address: factory,
+        abi: [{ type: "function", name: "AAVE_SEPOLIA_USDC", stateMutability: "view", inputs: [], outputs: [{ type: "address" }] }],
+        functionName: "AAVE_SEPOLIA_USDC",
+      });
+      if (aaveUsdc.toLowerCase() !== EXPECTED_AAVE_SEPOLIA_USDC.toLowerCase()) {
+        failures.push("factory AAVE_SEPOLIA_USDC does not match the official Arbitrum Sepolia USDC reserve — redeploy the factory before creating Aave-backed treasuries");
+      }
+    } catch {
+      failures.push("factory does not expose AAVE_SEPOLIA_USDC — it predates the Aave integration; redeploy the factory before creating Aave-backed treasuries");
+    }
   }
   if (process.env.KEEPER_HEARTBEAT_URL && (!process.env.KEEPER_HEARTBEAT_TOKEN || process.env.KEEPER_HEARTBEAT_TOKEN.length < 24)) failures.push("keeper heartbeat endpoint requires a token of at least 24 characters");
   if (!process.env.SOLVENT_DATABASE_PATH) console.log("NOTE: database defaults to .data/solvent.sqlite; production needs a persistent writable volume.");
