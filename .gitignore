@@ -33,3 +33,6 @@ next-env.d.ts
 /contracts/broadcast/
 
 /.superdesign/tmp/
+
+# local tooling artifacts
+/.taste/
