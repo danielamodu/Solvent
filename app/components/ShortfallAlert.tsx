@@ -56,13 +56,13 @@ export function ShortfallAlert({
   const busy = recall.isPending || recall.isConfirming;
 
   return (
-    <section className="rounded-xl border border-amber-600/40 bg-amber-950/30 p-4">
+    <section className="border-2 border-l-4 border-black border-l-[#ef4444] bg-white p-4 text-black">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="text-sm font-semibold text-amber-300">
+          <div className="cabinet text-sm uppercase tracking-tight text-[#ef4444]">
             Liquidity shortfall
           </div>
-          <p className="mt-1 text-xs text-amber-200/80">
+          <p className="mt-1 text-xs text-black/70">
             Protected liquidity exceeds idle cash by {formatUSD(shortfall, decimals)}.
             {recallable > 0n && <> Recall up to {formatUSD(recallable, decimals)} from the strategy.</>}
             {uncovered > 0n && <> {formatUSD(uncovered, decimals)} remains uncovered after all currently liquid strategy funds are recalled. Add funds or reduce/cancel obligations.</>}
@@ -80,7 +80,7 @@ export function ShortfallAlert({
               })
             }
             disabled={busy}
-            className="shrink-0 rounded-lg bg-amber-400 px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+            className="neo-btn neo-btn-primary shrink-0"
           >
             <BusyLabel busy={busy}>
               {recall.isPending

@@ -173,52 +173,52 @@ export function Vault() {
     deployed.isError ||
     protectedLiquidity.isError;
 
-  if (!hydrated) return <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5 text-sm text-neutral-400">Loading treasury configuration…</div>;
+  if (!hydrated) return <div className="neo-card p-5 text-sm text-black/50">Loading treasury configuration…</div>;
   if (!configured || showSetup) return <TreasurySetup onSelect={(value) => { setTreasury(value); setShowSetup(false); }} onCancel={configured ? () => setShowSetup(false) : undefined} />;
 
   return (
     <section className="flex flex-col gap-4">
       {readError && (
-        <div className="rounded-xl border border-red-600/40 bg-red-950/30 p-4">
-          <div className="text-sm font-semibold text-red-300">
+        <div className="border-2 border-l-4 border-black border-l-[#ef4444] bg-white p-4 text-black">
+          <div className="cabinet text-sm uppercase tracking-tight text-[#ef4444]">
             Unable to fetch data
           </div>
-          <p className="mt-1 text-xs text-red-200/80">
+          <p className="mt-1 text-xs text-black/70">
             Retrying… confirm your connection to Arbitrum Sepolia.
           </p>
         </div>
       )}
 
       {!isConnected && (
-        <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 text-sm text-neutral-400">
+        <div className="neo-card p-4 text-sm text-black/60">
           Connect a wallet to deposit, withdraw, or manage obligations — live
           treasury data is shown below.
         </div>
       )}
 
       {wrongNetwork && (
-        <div className="flex flex-col gap-3 rounded-xl border border-amber-600/40 bg-amber-950/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-2 border-l-4 border-black border-l-[#ffe17c] bg-white p-4 text-black sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-sm font-semibold text-amber-300">
+            <div className="cabinet text-sm uppercase tracking-tight">
               Wrong network
             </div>
-            <p className="mt-1 text-xs text-amber-200/80">
+            <p className="mt-1 text-xs text-black/70">
               This app runs on Arbitrum Sepolia. Switch networks to interact
               with the vault.
             </p>
           </div>
           <button
             onClick={() => switchChain({ chainId: CHAIN_ID })}
-            className="shrink-0 rounded-lg bg-amber-400 px-4 py-2 text-sm font-medium text-neutral-900"
+            className="neo-btn neo-btn-primary shrink-0"
           >
             Switch to Arbitrum Sepolia
           </button>
         </div>
       )}
 
-      <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-xs">
+      <div className="flex items-center justify-between border-2 border-black bg-white px-4 py-3 text-xs font-semibold text-black">
         <span>Connected treasury · {shortenAddress(treasury!.vault)}</span>
-        <button onClick={() => setShowSetup(true)} className="text-neutral-300 underline underline-offset-2">Change or add treasury</button>
+        <button onClick={() => setShowSetup(true)} className="font-bold text-black underline decoration-2 underline-offset-2">Change or add treasury</button>
       </div>
 
       <LiquidityTimeline
@@ -261,8 +261,8 @@ export function Vault() {
           loading={available.isLoading}
         />
       </div>
-      <section className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-xs text-neutral-400">
-        <h2 className="font-medium text-neutral-200">How liquidity is protected</h2>
+      <section className="neo-card-dark px-4 py-3 text-xs text-white/60">
+        <h2 className="cabinet text-xs uppercase tracking-tight text-white">How liquidity is protected</h2>
         <p className="mt-1">Protected liquidity is the reserve plus all pending obligations. Deployable capital is what remains after protected funds and existing deployments. Payment readiness assumes the displayed strategy liquidity can be withdrawn now.</p>
         {typeof ownerRead.data === "string" && <p className="mt-2">Controls: owner only ({shortenAddress(ownerRead.data)}). If this owner is a Safe, its configured threshold governs approvals. EOA-owned treasuries require an explicit ownership transfer to use a Safe.</p>}
       </section>
@@ -352,9 +352,9 @@ function Stat({
   loading: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <div className="text-xs text-neutral-500">{label}</div>
-      <div className="mt-1 text-lg font-semibold tabular-nums">
+    <div className="neo-card p-5">
+      <div className="neo-label">{label}</div>
+      <div className="mt-1 cabinet text-lg tabular-nums">
         {loading ? (
           <Skeleton className="h-6 w-24" />
         ) : (
@@ -384,12 +384,12 @@ function KeeperStatus({ vault }: { vault: `0x${string}` }) {
     return () => { active = false; window.clearInterval(id); };
   }, [vault]);
   const fresh = Boolean(status && Date.now() - status.lastHeartbeat < 120_000);
-  return <div className="flex flex-wrap items-center gap-2 px-1 text-xs text-neutral-500">
-    <span className={`h-2 w-2 rounded-full ${fresh && status?.state === "healthy" ? "bg-emerald-400" : fresh ? "bg-amber-400" : "bg-neutral-600"}`} aria-hidden />
-    <span className="font-medium text-neutral-400">Keeper</span>
+  return <div className="flex flex-wrap items-center gap-2 px-1 text-xs text-white/50">
+    <span className={`h-2 w-2 rounded-full ${fresh && status?.state === "healthy" ? "bg-[#10b981]" : fresh ? "bg-[#f59e0b]" : "bg-white/30"}`} aria-hidden />
+    <span className="font-bold text-white/80">Keeper</span>
     <span>{fresh ? `${status?.state} · heartbeat ${Math.max(0, Math.floor((Date.now() - status!.lastHeartbeat) / 1000))}s ago` : loaded ? "No recent heartbeat" : "Checking heartbeat…"}</span>
     {fresh && status?.lastAction && <span>· {status.lastAction}</span>}
-    {fresh && status?.lastError && <span className="text-amber-300">· {status.lastError}</span>}
+    {fresh && status?.lastError && <span className="text-[#ffe17c]">· {status.lastError}</span>}
   </div>;
 }
 
@@ -399,9 +399,9 @@ function DataFreshness({ updatedAt }: { updatedAt: number }) {
     const id = window.setInterval(() => setNow(Date.now()), 15_000);
     return () => window.clearInterval(id);
   }, []);
-  if (!updatedAt) return <p className="px-1 text-xs text-neutral-500">Waiting for the first onchain read…</p>;
+  if (!updatedAt) return <p className="px-1 text-xs text-white/45">Waiting for the first onchain read…</p>;
   const seconds = Math.max(0, Math.floor((now - updatedAt) / 1000));
-  return <p className="px-1 text-xs text-neutral-500">Vault data updated {seconds < 5 ? "just now" : `${seconds}s ago`} · refreshes after confirmed actions.</p>;
+  return <p className="px-1 text-xs text-white/45">Vault data updated {seconds < 5 ? "just now" : `${seconds}s ago`} · refreshes after confirmed actions.</p>;
 }
 
 function ReadinessAlerts({ vault, obligations, protectedLiquidity, availableBalance, strategyLiquidity, strategyPosition, decimals }: {
@@ -454,16 +454,16 @@ function ReadinessAlerts({ vault, obligations, protectedLiquidity, availableBala
     localStorage.setItem(seenKey, JSON.stringify([...seen]));
 }, [notifications, urgent, overdue, decimals]);
   if (!urgent.length && !overdue.length && totalGap === 0n && !persistentAlerts.length) return null;
-  return <section className="rounded-xl border border-amber-700/40 bg-amber-950/20 p-4">
+  return <section className="border-2 border-l-4 border-black border-l-[#ffe17c] bg-white p-4 text-black">
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div><h2 className="text-sm font-semibold text-amber-200">Treasury alerts</h2>
-        {overdue.length > 0 && <p className="mt-1 text-xs text-red-300">{overdue.length} pending {overdue.length === 1 ? "payment is" : "payments are"} overdue.</p>}
-        {urgent.length > 0 && <p className="mt-1 text-xs text-amber-100/80">{urgent.length} pending {urgent.length === 1 ? "payment is" : "payments are"} due within 7 days.</p>}
-        {totalGap > 0n && <p className="mt-1 text-xs text-amber-100/80">Protected funds exceed idle cash by {formatUSD(totalGap, decimals)}.{uncovered > 0n && ` ${formatUSD(uncovered, decimals)} remains uncovered after available strategy liquidity.`}</p>}
-        {persistentAlerts.map(alert => <p key={alert.id} className="mt-1 text-xs text-amber-100/80">{alert.message}</p>)}
+      <div><h2 className="cabinet text-sm uppercase tracking-tight">Treasury alerts</h2>
+        {overdue.length > 0 && <p className="mt-1 text-xs font-semibold text-[#ef4444]">{overdue.length} pending {overdue.length === 1 ? "payment is" : "payments are"} overdue.</p>}
+        {urgent.length > 0 && <p className="mt-1 text-xs text-black/70">{urgent.length} pending {urgent.length === 1 ? "payment is" : "payments are"} due within 7 days.</p>}
+        {totalGap > 0n && <p className="mt-1 text-xs text-black/70">Protected funds exceed idle cash by {formatUSD(totalGap, decimals)}.{uncovered > 0n && ` ${formatUSD(uncovered, decimals)} remains uncovered after available strategy liquidity.`}</p>}
+        {persistentAlerts.map(alert => <p key={alert.id} className="mt-1 text-xs text-black/70">{alert.message}</p>)}
       </div>
-      {typeof Notification !== "undefined" && Notification.permission !== "granted" && <button onClick={async () => { const p = await Notification.requestPermission(); setNotifications(p === "granted"); }} className="rounded-lg border border-amber-700/50 px-3 py-2 text-xs text-amber-100">Enable browser reminders</button>}
-      {notifications && <span className="text-xs text-emerald-300">Browser reminders enabled while this dashboard is open</span>}
+      {typeof Notification !== "undefined" && Notification.permission !== "granted" && <button onClick={async () => { const p = await Notification.requestPermission(); setNotifications(p === "granted"); }} className="neo-btn neo-btn-secondary">Enable browser reminders</button>}
+      {notifications && <span className="text-xs font-semibold text-[#10b981]">Browser reminders enabled while this dashboard is open</span>}
     </div>
   </section>;
 }
@@ -493,10 +493,10 @@ function TreasuryActivity({ vault }: { vault: `0x${string}` }) {
     const id = window.setInterval(() => void load(), 60_000);
     return () => window.clearInterval(id);
   }, [vault]);
-  return <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-    <div className="flex items-center justify-between gap-3"><div><h2 className="text-sm font-medium text-neutral-200">Recent activity</h2><p className="mt-1 text-xs text-neutral-500">Latest treasury and obligation events onchain.</p></div><button onClick={() => void load()} disabled={loading} className="rounded-md border border-neutral-700 px-2.5 py-1.5 text-xs text-neutral-300 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh"}</button></div>
-    {failed && <p className="mt-3 text-xs text-amber-300">Could not load activity. Check the RPC and try again.</p>}
-    {items.length ? <ul className="mt-3 divide-y divide-neutral-800">{items.map(i => <li key={i.id} className="flex justify-between gap-3 py-2 text-xs"><span className="text-neutral-300">{i.text}</span><span className="shrink-0 text-neutral-500">{new Date(i.timestamp * 1000).toLocaleString()}</span></li>)}</ul> : !failed && <p className="mt-3 text-xs text-neutral-500">{loading ? "Loading recent activity…" : "No recent activity found."}</p>}
-    <p className="mt-2 text-[10px] text-neutral-600">Activity is indexed from deployment and stored for this treasury.</p>
+  return <section className="neo-card p-5">
+    <div className="flex items-center justify-between gap-3"><div><h2 className="cabinet text-sm uppercase tracking-tight">Recent activity</h2><p className="mt-1 text-xs text-black/50">Latest treasury and obligation events onchain.</p></div><button onClick={() => void load()} disabled={loading} className="neo-btn neo-btn-secondary px-2.5 py-1.5">{loading ? "Refreshing…" : "Refresh"}</button></div>
+    {failed && <p className="mt-3 text-xs font-semibold text-[#b45309]">Could not load activity. Check the RPC and try again.</p>}
+    {items.length ? <ul className="mt-3 divide-y-2 divide-black/10">{items.map(i => <li key={i.id} className="flex justify-between gap-3 py-2 text-xs"><span className="text-black/80">{i.text}</span><span className="shrink-0 text-black/50">{new Date(i.timestamp * 1000).toLocaleString()}</span></li>)}</ul> : !failed && <p className="mt-3 text-xs text-black/50">{loading ? "Loading recent activity…" : "No recent activity found."}</p>}
+    <p className="mt-2 text-[10px] text-black/40">Activity is indexed from deployment and stored for this treasury.</p>
   </section>;
 }
