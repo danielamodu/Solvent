@@ -1,0 +1,214 @@
+{
+  "projectId": "a7d63f30-16cc-4a4e-b295-5c77ff67b7ac",
+  "nodes": [
+    {
+      "id": "b64390a2-5e5b-4245-8cff-cbe6ef602a46",
+      "title": "Solvent Soft Organic Hero",
+      "description": "A totally new hero direction for Solvent inspired by Jeton.com, featuring oversized 110px Satoshi/Cabinet typography, soft peach/coral layered gradients, and organic hand-drawn decorative elements. Includes a scroll-activated glass pill header.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/b64390a2-5e5b-4245-8cff-cbe6ef602a46/1790862476473.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/b64390a2-5e5b-4245-8cff-cbe6ef602a46",
+      "createdAt": "2026-10-01T13:47:26.939Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "f786ee7f-d624-4975-bd5b-0b02889a9099",
+      "title": "Solvent | Soft Jeton-Inspired Hero",
+      "description": "A radical departure from neo-brutalism towards a premium, soft, organic aesthetic. Features peachy-pink mesh gradients, oversized Zodiak serif typography, and delicate pill-shaped UI components with deep soft shadows. Inspired by the clean, approachable luxury of Jeton.com.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/f786ee7f-d624-4975-bd5b-0b02889a9099/1790862473317.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/f786ee7f-d624-4975-bd5b-0b02889a9099",
+      "createdAt": "2026-10-01T13:47:20.346Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "2976a5a0-3429-431d-8647-3957700ea215",
+      "title": "Solvent | Warm Energy Hero",
+      "description": "A totally new direction for the Solvent hero, inspired by Jeton's warm, organic, and friendly aesthetic. Features a coral-to-yellow gradient, soft blurred shapes, rounded friendly serif typography, and a inviting pastel color palette with abundant whitespace.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/2976a5a0-3429-431d-8647-3957700ea215/1790862476947.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/2976a5a0-3429-431d-8647-3957700ea215",
+      "createdAt": "2026-10-01T13:47:17.887Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "c896e8ee-9154-4c5d-95c6-3ff724cdabf3",
+      "title": "Solvent Onboarding | Ready to Begin",
+      "description": "The final completion screen for Solvent's onboarding flow, featuring a Neo-Brutalist three-column quick-start guide, a detailed feature highlight panel, and a massive primary CTA. Designed for desktop with high-contrast charcoal and yellow tones.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/c896e8ee-9154-4c5d-95c6-3ff724cdabf3/1790861047792.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/c896e8ee-9154-4c5d-95c6-3ff724cdabf3",
+      "createdAt": "2026-10-01T13:23:44.760Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "54d08dc2-fbc5-4a68-9797-bd76e133d20b",
+      "title": "Solvent Onboarding Step 3",
+      "description": "Neo-Brutalist onboarding screen explaining the Solvent liquidity protection flow with animated progress bars, formula cards, and a multi-step process diagram.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/54d08dc2-fbc5-4a68-9797-bd76e133d20b/1790861047794.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/54d08dc2-fbc5-4a68-9797-bd76e133d20b",
+      "createdAt": "2026-10-01T13:23:42.658Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "c4ecfa51-a9c2-408d-a913-b64b88c46b66",
+      "title": "Solvent Onboarding | Educational Screen",
+      "description": "Educational onboarding screen for Solvent using Neo-Brutalist design tokens. Features a high-contrast charcoal and yellow palette, hard-shadowed feature cards, and a comparison table highlighting protocol benefits.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/c4ecfa51-a9c2-408d-a913-b64b88c46b66/1790861045947.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/c4ecfa51-a9c2-408d-a913-b64b88c46b66",
+      "createdAt": "2026-10-01T13:23:24.640Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "018b0b9e-db1e-4737-951c-a5f23367b126",
+      "title": "Solvent Onboarding Welcome",
+      "description": "The introductory welcome screen for the Solvent treasury application, featuring a bold Neo-Brutalist design with high contrast, hard shadows, and a functional dashboard preview mockup.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/018b0b9e-db1e-4737-951c-a5f23367b126/1790861045980.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/018b0b9e-db1e-4737-951c-a5f23367b126",
+      "createdAt": "2026-10-01T13:23:20.479Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "02651965-2db2-4447-88a0-6ed9aa94353c",
+      "title": "Solvent Liquidity Management",
+      "description": "A high-contrast Neo-Brutalist dashboard for managing treasury liquidity, featuring a 4-segment allocation bar, upcoming obligations table, reserve requirement progress, and risk forecasting. Designed for desktop with heavy charcoal backgrounds and vibrant yellow accents.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/02651965-2db2-4447-88a0-6ed9aa94353c/1790860745186.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/02651965-2db2-4447-88a0-6ed9aa94353c",
+      "createdAt": "2026-10-01T13:18:53.140Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "a8d26b96-ad23-4d34-b439-9832dec40f99",
+      "title": "Solvent Transaction Modal System",
+      "description": "A high-fidelity interactive demo showcasing the transaction modal ecosystem for Solvent. Demonstrates TransactionModal for inputs, ConfirmationPanel for reviews, and TransactionFeedback for async states using Neo-Brutalist design tokens.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/a8d26b96-ad23-4d34-b439-9832dec40f99/1790860636437.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/a8d26b96-ad23-4d34-b439-9832dec40f99",
+      "createdAt": "2026-10-01T13:02:33.210Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "ac317328-cc8d-41ef-ae36-b5aa96bc689f",
+      "title": "Solvent | Deploy Capital",
+      "description": "A Neo-Brutalist deployment interface featuring a StrategyCard for capital allocation, safety guardrail metrics, and transaction lifecycle feedback. Uses a charcoal/yellow theme with hard shadows and Cabinet Grotesk typography.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/ac317328-cc8d-41ef-ae36-b5aa96bc689f/1790859089572.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/ac317328-cc8d-41ef-ae36-b5aa96bc689f",
+      "createdAt": "2026-10-01T12:49:47.910Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "20b1a7ea-2a76-4086-995c-45bdf487bc43",
+      "title": "Manage Obligations | Solvent",
+      "description": "Solvent workspace page for managing treasury obligations using a Neo-Brutalist design system. Features a creation form with validation and a list of outstanding promises with action controls.",
+      "screenshot": null,
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/20b1a7ea-2a76-4086-995c-45bdf487bc43",
+      "createdAt": "2026-10-01T12:49:32.248Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "1df58022-8b3d-4cd0-8d55-505f3486a888",
+      "title": "Solvent Dashboard Overview",
+      "description": "Neo-Brutalist dashboard cockpit for onchain treasury management. Features high-contrast card components, liquidity timeline with allocation mapping, stat tiles with skeletons, and a comprehensive activity feed using #ffe17c yellow and #171e19 charcoal.",
+      "screenshot": null,
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/1df58022-8b3d-4cd0-8d55-505f3486a888",
+      "createdAt": "2026-10-01T12:49:27.242Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "5e504683-9bd7-4465-b9f8-35e23733585d",
+      "title": "Solvent | Connect Wallet",
+      "description": "Neo-Brutalist wallet connection page for Solvent treasury app featuring a two-column layout with wallet selection, network switching prompts, and a comprehensive verification checklist card.",
+      "screenshot": null,
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/5e504683-9bd7-4465-b9f8-35e23733585d",
+      "createdAt": "2026-10-01T12:49:16.516Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "562ebcdc-ccdd-4296-bc56-6a191122729b",
+      "title": "Solvent Treasury Setup",
+      "description": "Neo-Brutalist treasury configuration page with a two-column layout, interactive form for asset and reserve selection, and a live deployment checklist to track smart contract wiring states.",
+      "screenshot": null,
+      "parentDraftId": null,
+      "iterationDepth": 0,
+      "previewUrl": "https://p.superdesign.dev/draft/562ebcdc-ccdd-4296-bc56-6a191122729b",
+      "createdAt": "2026-10-01T12:49:04.487Z",
+      "currentVersion": 1
+    },
+    {
+      "id": "4e432f56-82eb-452b-9325-6c18bbc46c8b",
+      "title": "Solvent | Complete Neo-Brutalist Experience",
+      "description": "Extended landing page with 4 new substantial sections: Why Solvent (Charcoal/Yellow), How It Works (Yellow Steps), Metrics & Testimonials (Charcoal), and a Brutalist FAQ section.",
+      "screenshot": {
+        "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/screenshots/drafts/4e432f56-82eb-452b-9325-6c18bbc46c8b/1790858337295.png",
+        "width": 800,
+        "height": 600
+      },
+      "parentDraftId": null,
+      "iterationDepth": 11,
+      "previewUrl": "https://p.superdesign.dev/draft/4e432f56-82eb-452b-9325-6c18bbc46c8b",
+      "createdAt": "2026-10-01T12:38:03.389Z",
+      "currentVersion": 12
+    }
+  ]
+}
