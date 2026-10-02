@@ -25,7 +25,7 @@ export default function DeployPage() {
 
   return <div className="workspace-shell flex min-h-screen flex-col">
     <WorkspaceHeader active="deploy" />
-    <main className="dot-pattern-light mx-auto w-full max-w-[1280px] flex-1 px-5 py-10 md:px-10">
+    <main className="dot-pattern-light mx-auto w-full max-w-[1440px] flex-1 px-5 py-10 md:px-10">
       <div><div className="neo-label text-[#b7c6c2]">Treasury actions</div><h1 className="cabinet mt-2 text-4xl uppercase tracking-tight text-white sm:text-5xl">Deploy capital</h1><p className="mt-3 max-w-3xl text-sm text-[#b7c6c2]">Deploy idle vault assets only after reserve requirements and pending payment obligations are protected.</p></div>
       {!configured ? <div className="neo-card-lg mt-8 p-8 text-center"><h2 className="cabinet text-lg uppercase tracking-tight">Connect a treasury before deploying</h2><Link href="/connect" className="neo-btn neo-btn-primary mt-5 inline-flex">Connect treasury</Link></div> : <>
         <div className="mt-8 grid gap-4 sm:grid-cols-3"><Metric label="Safe deployment limit" value={formatUSD(deployable.data, decimals)} primary /><Metric label="Upcoming obligations" value={formatUSD(outstanding.data, decimals)} /><Metric label="Current strategy position" value={formatUSD(deployed.data, decimals)} /></div>

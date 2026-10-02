@@ -40,7 +40,7 @@ export default function LiquidityPage() {
 
   return <div className="workspace-shell flex min-h-screen flex-col">
     <WorkspaceHeader active="liquidity" />
-    <main className="dot-pattern-light mx-auto w-full max-w-[1280px] flex-1 px-5 py-10 md:px-10">
+    <main className="dot-pattern-light mx-auto w-full max-w-[1440px] flex-1 px-5 py-10 md:px-10">
       <div className="flex flex-wrap items-end justify-between gap-5"><div><div className="neo-label text-[#b7c6c2]">Treasury controls</div><h1 className="cabinet mt-2 text-4xl uppercase tracking-tight text-white sm:text-5xl">Liquidity reserve</h1><p className="mt-3 max-w-2xl text-sm text-[#b7c6c2]">Funds protected for upcoming obligations and the treasury&rsquo;s reserve requirement stay out of deployment capacity.</p></div><Link href="/obligations" className="neo-btn neo-btn-secondary shrink-0">Manage obligations</Link></div>
       {!configured ? <div className="neo-card-lg mt-8 p-8 text-center"><h2 className="cabinet text-lg uppercase tracking-tight">Connect a treasury to see its reserve</h2><Link href="/connect" className="neo-btn neo-btn-primary mt-5 inline-flex">Connect treasury</Link></div> : <>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

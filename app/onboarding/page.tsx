@@ -58,7 +58,7 @@ export default function OnboardingPage() {
         />
       </div>
 
-      <main className="dot-pattern-light mx-auto w-full max-w-6xl flex-1 px-6 py-14 md:px-12">
+      <main className="dot-pattern-light mx-auto w-full max-w-[1440px] flex-1 px-6 py-14 md:px-12">
         {step === 0 && <WelcomeStep onStart={next} onDemo={() => router.push("/demo")} />}
         {step === 1 && <EducationalStep onNext={next} onBack={back} />}
         {step === 2 && <HowItWorksStep onNext={next} onBack={back} />}
