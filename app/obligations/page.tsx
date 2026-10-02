@@ -27,7 +27,7 @@ export default function ObligationsPage() {
 
   return <div className="workspace-shell flex min-h-screen flex-col">
     <WorkspaceHeader active="obligations" />
-    <main className="dot-pattern-light mx-auto w-full max-w-[1280px] flex-1 px-5 py-10 md:px-10">
+    <main className="dot-pattern-light mx-auto w-full max-w-[1440px] flex-1 px-5 py-10 md:px-10">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div><div className="neo-label text-[#b7c6c2]">Treasury commitments</div><h1 className="cabinet mt-2 text-4xl uppercase tracking-tight text-white sm:text-5xl">Upcoming obligations</h1><p className="mt-3 max-w-2xl text-sm text-[#b7c6c2]">Record payments before they are due. Each pending obligation reduces capital available for strategy deployment.</p></div>
         {configured && <a href="#create-obligation" className="neo-btn neo-btn-accent shrink-0">Create obligation +</a>}

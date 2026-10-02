@@ -52,11 +52,11 @@ export default function LandingPage() {
 
     <main className="flex-1">
       <section className="dot-pattern relative overflow-hidden bg-[#ffe17c] px-5 pb-24 pt-36 md:px-10">
-        <div className="mx-auto grid max-w-[1280px] items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
+        <div className="mx-auto grid max-w-[1440px] items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
           <div>
             <span className="badge inline-flex items-center gap-2 border-2 border-black bg-black text-[#ffe17c]"><span className="h-2 w-2 rounded-full bg-[#ffe17c]" />New · Obligation-aware treasury control</span>
-            <h1 className="cabinet mt-6 text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl md:text-7xl">Know what you owe.<br /><span className="text-transparent [-webkit-text-stroke:2px_#000]">Move what is free.</span></h1>
-            <p className="mt-6 max-w-xl text-lg leading-7 text-black/70">Solvent tracks every treasury commitment on-chain, protects the liquidity you need, and tells you the exact capital you can safely deploy.</p>
+            <h1 className="cabinet mt-6 text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl md:text-7xl xl:text-8xl">Know what you owe.<br /><span className="text-transparent [-webkit-text-stroke:2px_#000]">Move what is free.</span></h1>
+            <p className="mt-6 max-w-xl text-lg leading-7 text-black/70 lg:text-xl lg:leading-8">Solvent tracks every treasury commitment on-chain, protects the liquidity you need, and tells you the exact capital you can safely deploy.</p>
             <div className="mt-9 flex flex-wrap gap-4">
               <Link href="/onboarding" className="neo-btn neo-btn-primary px-7 py-4 text-base">Connect wallet <ArrowUpRight size={18} /></Link>
               <Link href="/dashboard" className="neo-btn neo-btn-secondary px-7 py-4 text-base">View dashboard</Link>
@@ -75,9 +75,9 @@ export default function LandingPage() {
       </section>
       <div className="overflow-hidden border-y-2 border-black bg-white py-4"><div className="animate-marquee"><Marquee /><Marquee /></div></div>
       <section className="bg-[#171e19] px-5 py-24 text-white md:px-10">
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1440px]">
           <div className="neo-label text-[#b7c6c2]">Why Solvent</div>
-          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl">Treasury management that starts with liabilities</h2>
+          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Treasury management that starts with liabilities</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {whyCards.map(({ icon: Icon, title, body }) => <div key={title} className="accent-bar border-2 border-black bg-white p-7 text-black shadow-[8px_8px_0_0_#000]">
               <span className="grid h-12 w-12 place-items-center border-2 border-black bg-[#ffe17c]"><Icon size={22} /></span>
@@ -89,9 +89,9 @@ export default function LandingPage() {
       </section>
 
       <section id="product" className="bg-white px-5 py-24 md:px-10">
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1440px]">
           <div className="neo-label">The product</div>
-          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl">Record the promise. Protect it. Deploy the rest.</h2>
+          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Record the promise. Protect it. Deploy the rest.</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {productCards.map(({ icon: Icon, title, body, bg }) => <div key={title} className={`border-2 border-black p-7 shadow-[8px_8px_0_0_#000] ${bg}`}>
               <span className="grid h-12 w-12 place-items-center border-2 border-black bg-black text-[#ffe17c]"><Icon size={22} /></span>
@@ -102,9 +102,9 @@ export default function LandingPage() {
         </div>
       </section>
       <section id="how" className="dot-pattern bg-[#ffe17c] px-5 py-24 md:px-10">
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1440px]">
           <div className="neo-label">How it works</div>
-          <h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl">Four steps to total clarity</h2>
+          <h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Four steps to total clarity</h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map(({ n, title, body, dark }) => <div key={n} className={`border-2 border-black p-6 shadow-[8px_8px_0_0_#000] ${dark ? "bg-[#171e19] text-white" : "bg-white text-black"}`}>
               <span className={`cabinet grid h-12 w-12 place-items-center border-2 text-xl ${dark ? "border-white bg-[#ffe17c] text-black" : "border-black bg-black text-[#ffe17c]"}`}>{n}</span>
@@ -116,9 +116,9 @@ export default function LandingPage() {
       </section>
 
       <section className="bg-[#171e19] px-5 py-24 text-white md:px-10">
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1440px]">
           <div className="neo-label text-[#b7c6c2]">Capital legibility</div>
-          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl">Every dollar has a job</h2>
+          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Every dollar has a job</h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Primitive label="Reserve" sub="Operational floor" bg="bg-[#b7c6c2]" />
             <Primitive label="Obligations" sub="Promised out" bg="bg-[#ffe17c]" />
@@ -129,9 +129,9 @@ export default function LandingPage() {
         </div>
       </section>
       <section id="app" className="bg-white px-5 py-24 md:px-10">
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1440px]">
           <div className="neo-label">The workspace</div>
-          <h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl">Four views, one source of truth</h2>
+          <h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Four views, one source of truth</h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {views.map(({ icon: Icon, title, body, href, bg }) => <Link key={title} href={href} className={`group border-2 border-black p-6 shadow-[8px_8px_0_0_#000] transition-transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#000] ${bg}`}>
               <span className="grid h-12 w-12 place-items-center border-2 border-black bg-black text-[#ffe17c]"><Icon size={22} /></span>
@@ -143,8 +143,8 @@ export default function LandingPage() {
       </section>
 
       <section className="bg-[#b7c6c2] px-5 py-24 md:px-10">
-        <div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[.8fr_1.2fr]">
-          <div><div className="neo-label">FAQ</div><h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl">Questions, answered</h2><p className="mt-4 text-sm leading-6 text-black/70">Everything you need to know about obligation-aware treasury management on Solvent.</p></div>
+        <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[.8fr_1.2fr]">
+          <div><div className="neo-label">FAQ</div><h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Questions, answered</h2><p className="mt-4 text-sm leading-6 text-black/70">Everything you need to know about obligation-aware treasury management on Solvent.</p></div>
           <div className="space-y-4">
             {faqs.map(({ q, a }) => <details key={q} className="border-2 border-black bg-white p-5 shadow-[6px_6px_0_0_#000] [&_svg]:open:rotate-180">
               <summary className="flex cursor-pointer items-center justify-between gap-4 font-bold uppercase tracking-tight marker:content-none"><span>{q}</span><ChevronDown size={18} className="shrink-0 transition-transform" /></summary>
@@ -155,7 +155,7 @@ export default function LandingPage() {
       </section>
       <section className="dot-pattern bg-[#ffe17c] px-5 py-28 text-center md:px-10">
         <div className="mx-auto max-w-[820px]">
-          <h2 className="cabinet text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl">Deploy with total clarity.</h2>
+          <h2 className="cabinet text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">Deploy with total clarity.</h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-7 text-black/70">Connect your treasury, record what you owe, and move only the capital that is truly free.</p>
           <Link href="/onboarding" className="neo-btn neo-btn-primary mt-9 inline-flex px-8 py-4 text-base">Launch application <ArrowUpRight size={18} /></Link>
         </div>
@@ -163,7 +163,7 @@ export default function LandingPage() {
     </main>
 
     <footer className="bg-[#171e19] px-5 py-16 text-white md:px-10">
-      <div className="mx-auto grid max-w-[1280px] gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-[1440px] gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2"><span className="grid h-9 w-9 place-items-center border-2 border-white bg-[#ffe17c] text-black"><Zap size={18} /></span><span className="cabinet text-xl uppercase tracking-tight">Solvent</span></div>
           <p className="mt-4 max-w-xs text-sm leading-6 text-[#b7c6c2]">Obligation-aware treasury management. Know what you owe, move what is free.</p>
@@ -187,7 +187,7 @@ export default function LandingPage() {
           </ul>
         </div>
       </div>
-      <div className="mx-auto mt-12 flex max-w-[1280px] flex-col items-center justify-between gap-3 border-t-2 border-white/15 pt-6 text-xs text-[#b7c6c2] sm:flex-row">
+      <div className="mx-auto mt-12 flex max-w-[1440px] flex-col items-center justify-between gap-3 border-t-2 border-white/15 pt-6 text-xs text-[#b7c6c2] sm:flex-row">
         <span>© 2026 Solvent. Testnet software — no real-world value.</span>
         <span className="inline-flex items-center gap-2"><Shield size={14} /> Arbitrum Sepolia testnet</span>
       </div>

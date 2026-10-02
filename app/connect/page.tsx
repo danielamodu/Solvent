@@ -25,7 +25,7 @@ export default function ConnectPage() {
 
   return <div className="workspace-shell flex min-h-screen flex-col">
     <WorkspaceHeader active="connect" />
-    <main className="dot-pattern-light mx-auto w-full max-w-[1280px] flex-1 px-5 py-12 md:px-10 lg:py-16">
+    <main className="dot-pattern-light mx-auto w-full max-w-[1440px] flex-1 px-5 py-12 md:px-10 lg:py-16">
       <div className="grid gap-8 lg:grid-cols-[.88fr_1.12fr]">
         <div className="flex flex-col justify-center">
           <div className="neo-label text-[#b7c6c2]">Verify onchain credentials</div>
