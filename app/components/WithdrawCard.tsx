@@ -10,6 +10,7 @@ import {
 import { useTreasury } from "@/lib/treasury-context";
 import { useTx } from "@/lib/useTx";
 import { BusyLabel, TxFeedback } from "./ui";
+import { ArrowUpFromLine } from "lucide-react";
 
 export function WithdrawCard({
   decimals,
@@ -48,11 +49,18 @@ export function WithdrawCard({
   const hint = disabled ? disabledReason : undefined;
 
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <h2 className="text-sm font-medium text-neutral-200">Withdraw {symbol}</h2>
-      <p className="mt-1 text-xs text-neutral-500">
-        {isOwner ? "Owner only — funds leave the vault." : "Only the vault owner can withdraw."}
-      </p>
+    <div className="neo-card p-5">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-black bg-[#b7c6c2]">
+          <ArrowUpFromLine className="h-5 w-5 text-black" aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="cabinet text-sm uppercase tracking-tight">Withdraw {symbol}</h2>
+          <p className="mt-0.5 text-xs font-semibold text-black/50">
+            {isOwner ? "Owner only — funds leave the vault." : "Only the vault owner can withdraw."}
+          </p>
+        </div>
+      </div>
       <input
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
@@ -60,7 +68,7 @@ export function WithdrawCard({
         inputMode="decimal"
         disabled={locked}
         title={hint}
-        className="mt-3 w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50"
+        className="neo-input cabinet text-lg"
       />
       <input
         value={recipient}
@@ -68,7 +76,7 @@ export function WithdrawCard({
         placeholder="Recipient (defaults to you)"
         disabled={locked}
         title={hint}
-        className="mt-2 w-full rounded-lg bg-neutral-800 px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50"
+        className="neo-input mt-2 text-xs"
       />
       <button
         onClick={() =>
@@ -85,7 +93,7 @@ export function WithdrawCard({
         }
         disabled={locked || parsed === null || parsed === 0n || !validRecipient || busy}
         title={hint}
-        className="mt-3 w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+        className="neo-btn neo-btn-primary mt-3 w-full"
       >
         <BusyLabel busy={busy}>
           {withdraw.isPending

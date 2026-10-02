@@ -1,0 +1,36 @@
+{
+  "projectId": "a7d63f30-16cc-4a4e-b295-5c77ff67b7ac",
+  "components": [
+    {
+      "id": "73c9495c-c799-4595-b9b2-f71f4d21b363",
+      "name": "TransactionModal",
+      "description": "Reusable transaction modal with amount input, recipient field, summary, and transaction feedback",
+      "version": 1
+    },
+    {
+      "id": "39e61676-4d88-4f7b-b088-0e420fad125b",
+      "name": "ConfirmationPanel",
+      "description": "Review/confirmation panel with details grid, risk indicator, and optional warning messages",
+      "version": 1
+    },
+    {
+      "id": "963ae1a2-c387-48a9-b28e-6158bc6910c4",
+      "name": "TransactionFeedback",
+      "description": "Transaction status feedback toast with pending, confirming, confirmed, error, and cancelled states",
+      "version": 1
+    },
+    {
+      "id": "4b6b345d-b97f-43d9-b491-7f44a0e947dc",
+      "name": "WorkspaceHeader",
+      "description": "Dark workspace header with nav tabs and back button",
+      "version": 1
+    },
+    {
+      "id": "1b1dbc36-3eda-4a51-b354-9ee4e8f42d10",
+      "name": "WorkspaceFooter",
+      "description": "Slim workspace footer with network info and links",
+      "version": 1
+    }
+  ],
+  "total": 5
+}

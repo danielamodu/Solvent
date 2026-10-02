@@ -12,6 +12,7 @@ import { useTreasury } from "@/lib/treasury-context";
 import { formatUSD } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
 import { BusyLabel, TxFeedback } from "./ui";
+import { ArrowDownToLine } from "lucide-react";
 
 export function DepositCard({
   decimals,
@@ -79,11 +80,18 @@ export function DepositCard({
     deposit.hash || deposit.errorMessage || deposit.cancelled ? deposit : approve;
 
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <h2 className="text-sm font-medium text-neutral-200">Deposit {symbol}</h2>
-      <p className="mt-1 text-xs text-neutral-500">
-        Wallet: {formatUSD(balance.data, decimals)}
-      </p>
+    <div className="neo-card p-5">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-black bg-[#b7c6c2]">
+          <ArrowDownToLine className="h-5 w-5 text-black" aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="cabinet text-sm uppercase tracking-tight">Deposit {symbol}</h2>
+          <p className="mt-0.5 text-xs font-semibold text-black/50">
+            Wallet: {formatUSD(balance.data, decimals)}
+          </p>
+        </div>
+      </div>
       <input
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
@@ -91,7 +99,7 @@ export function DepositCard({
         inputMode="decimal"
         disabled={disabled}
         title={disabled ? disabledReason : undefined}
-        className="mt-3 w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50"
+        className="neo-input cabinet text-lg"
       />
       {needsApproval ? (
         <>
@@ -108,7 +116,7 @@ export function DepositCard({
             }
             disabled={parsed === null || parsed === 0n || insufficientBalance || busy || disabled}
             title={disabled ? disabledReason : undefined}
-            className="mt-3 w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+            className="neo-btn neo-btn-primary mt-3 w-full"
           >
             <BusyLabel busy={approve.isPending || approve.isConfirming}>
               {approve.isPending
@@ -119,7 +127,7 @@ export function DepositCard({
             </BusyLabel>
           </button>
           {!insufficientBalance && parsed !== null && (
-            <p className="mt-2 text-[11px] text-neutral-500">
+            <p className="mt-2 text-[11px] text-black/50">
               One-time approval so the vault can pull your {symbol}, then deposit.
             </p>
           )}
@@ -138,7 +146,7 @@ export function DepositCard({
           }
           disabled={parsed === null || parsed === 0n || insufficientBalance || busy || disabled}
           title={disabled ? disabledReason : undefined}
-          className="mt-3 w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+          className="neo-btn neo-btn-primary mt-3 w-full"
         >
           <BusyLabel busy={deposit.isPending || deposit.isConfirming}>
             {deposit.isPending
@@ -150,7 +158,7 @@ export function DepositCard({
         </button>
       )}
       {insufficientBalance && (
-        <p className="mt-2 text-xs text-red-400">Insufficient balance.</p>
+        <p className="mt-2 text-xs font-bold text-[#ef4444]">Insufficient balance.</p>
       )}
       <TxFeedback tx={activeTx} />
     </div>

@@ -1,19 +1,25 @@
 "use client";
 
-import { useState } from "react";
 import { parseUnits } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import { CHAIN_ID, erc20Abi, susdFaucetAbi } from "@/lib/contracts";
 import { useTreasury } from "@/lib/treasury-context";
 import { formatUSD } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
+import {
+  FAUCET_AMOUNT,
+  formatCooldown,
+  useFaucetCooldown,
+} from "@/lib/useFaucet";
 import { BusyLabel, TxFeedback } from "./ui";
+import { Coins } from "lucide-react";
 
 /**
- * Testnet faucet — mints SolventUSD (SUSD) straight to the connected wallet via
- * the token's unrestricted `mint`, so anyone can fund themselves before
- * depositing. Only rendered for treasuries whose asset supports open minting
- * (i.e. SUSD / mock assets, not canonical Aave USDC — see Vault).
+ * Testnet faucet — mints a fixed {@link FAUCET_AMOUNT} of SolventUSD (SUSD)
+ * straight to the connected wallet via the token's unrestricted `mint`, paced by
+ * a 6-hour cooldown shared with the onboarding claim (see useFaucetCooldown).
+ * Only rendered for treasuries whose asset supports open minting (i.e. SUSD /
+ * mock assets, not canonical Aave USDC — see Vault).
  */
 export function FaucetCard({
   decimals,
@@ -28,8 +34,6 @@ export function FaucetCard({
 }) {
   const { address } = useAccount();
   const { treasury } = useTreasury();
-  const [amount, setAmount] = useState("10000");
-
   const token = treasury!.asset;
 
   const balance = useReadContract({
@@ -41,62 +45,65 @@ export function FaucetCard({
     query: { enabled: Boolean(address) },
   });
 
+  const { canClaim, hasClaimed, remainingMs, recordClaim } =
+    useFaucetCooldown(address);
+
   const mint = useTx(() => {
+    recordClaim();
     balance.refetch();
     onChange();
   });
 
-  let parsed: bigint | null = null;
-  try {
-    parsed = amount ? parseUnits(amount, decimals) : null;
-  } catch {
-    parsed = null;
-  }
-
+  const amountUnits = parseUnits(String(FAUCET_AMOUNT), decimals);
   const busy = mint.isPending || mint.isConfirming;
+  const onCooldown = hasClaimed && !canClaim;
+  const blocked = disabled || !address || busy || !canClaim;
 
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <h2 className="text-sm font-medium text-neutral-200">Get test SUSD</h2>
-      <p className="mt-1 text-xs text-neutral-500">
-        Wallet: {formatUSD(balance.data, decimals)} · free testnet faucet
-      </p>
-      <input
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        placeholder="10000"
-        inputMode="decimal"
-        disabled={disabled}
-        title={disabled ? disabledReason : undefined}
-        className="mt-3 w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50"
-      />
+    <div className="neo-card p-5">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-black bg-[#b7c6c2]">
+          <Coins className="h-5 w-5 text-black" aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="cabinet text-sm uppercase tracking-tight">Get test SUSD</h2>
+          <p className="mt-0.5 text-xs font-semibold text-black/50">
+            Wallet: {formatUSD(balance.data, decimals)} · {FAUCET_AMOUNT.toLocaleString()} SUSD per claim
+          </p>
+        </div>
+      </div>
       <button
         onClick={() =>
-          parsed !== null &&
           address &&
+          canClaim &&
           mint.writeContract({
             address: token,
             abi: susdFaucetAbi,
             functionName: "mint",
-            args: [address, parsed],
+            args: [address, amountUnits],
             chainId: CHAIN_ID,
           })
         }
-        disabled={parsed === null || parsed === 0n || busy || disabled || !address}
+        disabled={blocked}
         title={disabled ? disabledReason : undefined}
-        className="mt-3 w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+        className="neo-btn neo-btn-primary w-full"
       >
         <BusyLabel busy={busy}>
           {mint.isPending
             ? "Confirm in wallet…"
             : mint.isConfirming
               ? "Minting…"
-              : "Mint SUSD"}
+              : !address
+                ? "Connect a wallet"
+                : onCooldown
+                  ? `Next claim in ${formatCooldown(remainingMs)}`
+                  : `Claim ${FAUCET_AMOUNT.toLocaleString()} SUSD`}
         </BusyLabel>
       </button>
-      <p className="mt-2 text-[11px] text-neutral-500">
-        SUSD is a 6-decimal test token with an open mint — testnet only, no real
-        value. Mint what you need, then deposit it into the vault.
+      <p className="mt-2 text-[11px] text-black/50">
+        {onCooldown
+          ? "The faucet dispenses once every 6 hours. Mint SUSD is a 6-decimal test token — testnet only, no real value."
+          : "SUSD is a 6-decimal test token with an open mint — testnet only, no real value. The in-app faucet drips once every 6 hours."}
       </p>
       <TxFeedback tx={mint} />
     </div>

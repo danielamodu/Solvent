@@ -13,23 +13,20 @@ export function riskLevel(coverage: number | null): Level {
   return "red";
 }
 
-const STYLES: Record<Level, { dot: string; text: string; box: string; label: string }> = {
+const STYLES: Record<Level, { dot: string; box: string; label: string }> = {
   green: {
-    dot: "bg-emerald-400",
-    text: "text-emerald-300",
-    box: "border-emerald-500/30 bg-emerald-500/10",
+    dot: "bg-black/40",
+    box: "bg-[#10b981] text-white",
     label: "Fully covered",
   },
   amber: {
-    dot: "bg-amber-400",
-    text: "text-amber-300",
-    box: "border-amber-500/30 bg-amber-500/10",
+    dot: "bg-black/40",
+    box: "bg-[#ffe17c] text-black",
     label: "Monitor",
   },
   red: {
-    dot: "bg-red-400",
-    text: "text-red-300",
-    box: "border-red-500/30 bg-red-500/10",
+    dot: "bg-white/70",
+    box: "bg-[#ef4444] text-white",
     label: "At risk",
   },
 };
@@ -38,9 +35,9 @@ export function RiskBadge({ coverage }: { coverage: number | null }) {
   const s = STYLES[riskLevel(coverage)];
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-colors duration-300 ${s.box} ${s.text}`}
+      className={`badge gap-1.5 transition-colors duration-300 ${s.box}`}
     >
-      <span className={`h-2 w-2 rounded-full ${s.dot}`} />
+      <span className={`h-2 w-2 rounded-full ${s.dot}`} aria-hidden="true" />
       {s.label}
     </span>
   );

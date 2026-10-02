@@ -14,6 +14,7 @@ import { formatDueDate, formatUSD, relativeDue, shortenAddress } from "@/lib/for
 import { useTx } from "@/lib/useTx";
 import type { ObligationRecord } from "@/lib/useObligations";
 import { BusyLabel, TxFeedback } from "./ui";
+import { ClipboardList } from "lucide-react";
 
 const PRIORITY_OPTIONS = [
   { label: "High", value: PRIORITY.HIGH },
@@ -121,13 +122,20 @@ export function ObligationCard({
   const rows = [...obligations].reverse();
 
   return (
-    <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <h2 className="text-sm font-medium text-neutral-200">Obligations</h2>
-      <p className="mt-1 text-xs text-neutral-500">
-        {isOwner
-          ? "Owner only — each obligation reserves protected liquidity."
-          : "Only the vault owner can create or settle obligations."}
-      </p>
+    <section className="neo-card-lg p-5">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-black bg-[#b7c6c2]">
+          <ClipboardList className="h-5 w-5 text-black" aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="cabinet text-sm uppercase tracking-tight">Obligations</h2>
+          <p className="mt-0.5 text-xs font-semibold text-black/50">
+            {isOwner
+              ? "Owner only — each obligation reserves protected liquidity."
+              : "Only the vault owner can create or settle obligations."}
+          </p>
+        </div>
+      </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <input
@@ -136,7 +144,7 @@ export function ObligationCard({
           placeholder="Beneficiary address (0x…)"
           disabled={locked}
           title={hint}
-          className="w-full rounded-lg bg-neutral-800 px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50 sm:col-span-2"
+          className="neo-input text-xs sm:col-span-2"
         />
         <input
           value={amount}
@@ -145,7 +153,7 @@ export function ObligationCard({
           inputMode="decimal"
           disabled={locked}
           title={hint}
-          className="w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50"
+          className="neo-input"
         />
         <input
           type="date"
@@ -154,14 +162,14 @@ export function ObligationCard({
           onChange={(e) => setDueDate(e.target.value)}
           disabled={locked}
           title={hint}
-          className="w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50"
+          className="neo-input"
         />
         <select
           value={priority}
           onChange={(e) => setPriority(Number(e.target.value))}
           disabled={locked}
           title={hint}
-          className="w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50 sm:col-span-2"
+          className="neo-input sm:col-span-2"
         >
           {PRIORITY_OPTIONS.map((p) => (
             <option key={p.value} value={p.value}>
@@ -174,7 +182,7 @@ export function ObligationCard({
         onClick={submitCreate}
         disabled={!canCreate || creating}
         title={hint}
-        className="mt-3 w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+        className="neo-btn neo-btn-primary mt-3 w-full"
       >
         <BusyLabel busy={creating}>
           {create.isPending
@@ -188,7 +196,7 @@ export function ObligationCard({
 
       <div className="mt-5 flex flex-col gap-2">
         {rows.length === 0 && (
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-black/50">
             No obligations yet — surplus is free to deploy.
           </p>
         )}
@@ -208,19 +216,19 @@ export function ObligationCard({
       {review && (() => {
         const item = obligations.find(o => o.id === review.id);
         if (!item) return null;
-        return <div className="mt-4 rounded-lg border border-amber-700/40 bg-amber-950/20 p-4">
-          <h3 className="text-sm font-semibold text-amber-100">Review {review.fn === "settleObligation" ? "payment" : "cancellation"}</h3>
-          <p className="mt-2 text-xs leading-5 text-amber-100/80">
+        return <div className="accent-bar mt-4 border-2 border-black bg-black/5 p-4">
+          <h3 className="cabinet text-sm uppercase tracking-tight">Review {review.fn === "settleObligation" ? "payment" : "cancellation"}</h3>
+          <p className="mt-2 text-xs leading-5 text-black/70">
             {review.fn === "settleObligation"
               ? <>Send <strong>{formatUSD(item.amount, decimals)}</strong> to <code>{shortenAddress(item.beneficiary)}</code>. This pays from idle vault funds and marks the obligation settled.</>
               : <>Cancel the <strong>{formatUSD(item.amount, decimals)}</strong> obligation to <code>{shortenAddress(item.beneficiary)}</code>. This releases its protected liquidity.</>}
           </p>
           {review.fn === "settleObligation" && (availableBalance !== undefined && availableBalance < item.amount
-            ? <p className="mt-2 text-xs text-red-300">Not ready: the vault has {formatUSD(availableBalance, decimals)} idle, but this payment needs {formatUSD(item.amount, decimals)}. Recall funds first.</p>
-            : <p className="mt-2 text-xs text-neutral-400">Confirm in your wallet to submit this onchain payment to the beneficiary.</p>)}
+            ? <p className="mt-2 text-xs font-bold text-[#ef4444]">Not ready: the vault has {formatUSD(availableBalance, decimals)} idle, but this payment needs {formatUSD(item.amount, decimals)}. Recall funds first.</p>
+            : <p className="mt-2 text-xs text-black/50">Confirm in your wallet to submit this onchain payment to the beneficiary.</p>)}
           <div className="mt-3 flex gap-2">
-            <button onClick={confirmRowAction} disabled={rowBusy || disabled || (review.fn === "settleObligation" && availableBalance !== undefined && availableBalance < item.amount)} className="rounded-md bg-white px-3 py-2 text-xs font-medium text-neutral-900 disabled:opacity-40"><BusyLabel busy={rowBusy}>Confirm in wallet</BusyLabel></button>
-            <button onClick={() => setReview(null)} disabled={rowBusy} className="rounded-md border border-neutral-700 px-3 py-2 text-xs text-neutral-300 disabled:opacity-40">Back</button>
+            <button onClick={confirmRowAction} disabled={rowBusy || disabled || (review.fn === "settleObligation" && availableBalance !== undefined && availableBalance < item.amount)} className="neo-btn neo-btn-primary"><BusyLabel busy={rowBusy}>Confirm in wallet</BusyLabel></button>
+            <button onClick={() => setReview(null)} disabled={rowBusy} className="neo-btn neo-btn-secondary">Back</button>
           </div>
         </div>;
       })()}
@@ -230,9 +238,9 @@ export function ObligationCard({
 }
 
 const PRIORITY_STYLES = [
-  "bg-red-500/15 text-red-300", // HIGH
-  "bg-amber-500/15 text-amber-300", // MEDIUM
-  "bg-neutral-700 text-neutral-300", // LOW
+  "bg-[#ef4444] text-white", // HIGH
+  "bg-[#ffe17c] text-black", // MEDIUM
+  "bg-[#b7c6c2] text-black", // LOW
 ] as const;
 
 function ObligationRow({
@@ -255,20 +263,20 @@ function ObligationRow({
   const isPending = o.status === 0;
   const rel = relativeDue(o.dueAt);
   return (
-    <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-3">
+    <div className="border-2 border-black bg-white p-3">
       <div className="flex items-center justify-between gap-3">
-        <div className="text-sm font-semibold tabular-nums">
+        <div className="cabinet text-sm tabular-nums">
           {formatUSD(o.amount, decimals)}
         </div>
         <span
-          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+          className={`badge ${
             PRIORITY_STYLES[o.priority] ?? PRIORITY_STYLES[2]
           }`}
         >
           {PRIORITY_LABELS[o.priority] ?? "—"}
         </span>
       </div>
-      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-500">
+      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-black/50">
         <span>To {shortenAddress(o.beneficiary)}</span>
         <span>
           Due {formatDueDate(o.dueAt)}
@@ -276,8 +284,8 @@ function ObligationRow({
             <span
               className={
                 rel === "OVERDUE"
-                  ? "font-medium text-red-400"
-                  : "text-neutral-400"
+                  ? "font-bold text-[#ef4444]"
+                  : "text-black/70"
               }
             >
               {" · "}
@@ -285,7 +293,7 @@ function ObligationRow({
             </span>
           )}
         </span>
-        <span className={isPending ? "text-neutral-400" : "text-neutral-600"}>
+        <span className={isPending ? "font-semibold text-black/70" : "text-black/40"}>
           {STATUS_LABELS[o.status] ?? "—"}
         </span>
       </div>
@@ -294,14 +302,14 @@ function ObligationRow({
           <button
             onClick={onSettle}
             disabled={disabled}
-            className="rounded-md bg-white px-3 py-1 text-xs font-medium text-neutral-900 disabled:opacity-40"
+            className="neo-btn neo-btn-primary px-3 py-1"
           >
             <BusyLabel busy={busy}>{busy ? "Settling…" : "Settle"}</BusyLabel>
           </button>
           <button
             onClick={onCancel}
             disabled={disabled}
-            className="rounded-md border border-neutral-700 px-3 py-1 text-xs font-medium text-neutral-300 disabled:opacity-40"
+            className="neo-btn neo-btn-secondary px-3 py-1"
           >
             Cancel
           </button>

@@ -12,6 +12,7 @@ import { useTreasury } from "@/lib/treasury-context";
 import { formatUSD } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
 import { BusyLabel, TxFeedback } from "./ui";
+import { Rocket } from "lucide-react";
 
 export function StrategyCard({
   decimals,
@@ -94,38 +95,45 @@ export function StrategyCard({
         : deploy;
 
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <h2 className="text-sm font-medium text-neutral-200">Strategy position</h2>
-      <p className="mt-1 text-xs text-neutral-500">
-        {isOwner
-          ? "Owner only — deploy surplus to the strategy or recall it back."
-          : "Only the vault owner can deploy or recall capital."}
-      </p>
+    <div className="neo-card p-5">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-black bg-[#b7c6c2]">
+          <Rocket className="h-5 w-5 text-black" aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="cabinet text-sm uppercase tracking-tight">Strategy position</h2>
+          <p className="mt-0.5 text-xs font-semibold text-black/50">
+            {isOwner
+              ? "Owner only — deploy surplus to the strategy or recall it back."
+              : "Only the vault owner can deploy or recall capital."}
+          </p>
+        </div>
+      </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <div className="rounded-lg bg-neutral-800 px-3 py-2">
-          <div className="text-[11px] text-neutral-500">Principal deployed</div>
-          <div className="mt-0.5 text-sm font-semibold tabular-nums">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="border-2 border-black bg-black/5 p-3">
+          <div className="neo-label">Principal deployed</div>
+          <div className="cabinet text-base tabular-nums">
             {formatUSD(position.data, decimals)}
           </div>
         </div>
-        <div className="rounded-lg bg-neutral-800 px-3 py-2">
-          <div className="text-[11px] text-neutral-500">Current strategy value</div>
-          <div className="mt-0.5 text-sm font-semibold tabular-nums">
+        <div className="border-2 border-black bg-black/5 p-3">
+          <div className="neo-label">Current strategy value</div>
+          <div className="cabinet text-base tabular-nums">
             {formatUSD(value.data, decimals)}
           </div>
         </div>
-        <div className="rounded-lg bg-neutral-800 px-3 py-2">
-          <div className="text-[11px] text-neutral-500">Available liquidity</div>
-          <div className="mt-0.5 text-sm font-semibold tabular-nums">
+        <div className="border-2 border-black bg-black/5 p-3">
+          <div className="neo-label">Available liquidity</div>
+          <div className="cabinet text-base tabular-nums">
             {formatUSD(liquidity.data, decimals)}
           </div>
         </div>
+        {(accruedYield.data ?? 0n) > 0n && <div className="border-2 border-black bg-black/5 p-3"><div className="neo-label">Unharvested Aave yield</div><div className="cabinet text-base tabular-nums text-[#10b981]">{formatUSD(accruedYield.data, decimals)}</div></div>}
       </div>
-      {(accruedYield.data ?? 0n) > 0n && <div className="mt-2 flex items-center justify-between rounded-lg border border-emerald-900 bg-emerald-950/30 px-3 py-2 text-xs"><span className="text-emerald-300">Unharvested Aave yield</span><span className="font-semibold tabular-nums text-emerald-200">{formatUSD(accruedYield.data, decimals)}</span></div>}
-      {isOwner && (accruedYield.data ?? 0n) > 0n && <button type="button" onClick={() => harvest.writeContract({ address: vault, abi: treasuryVaultAbi, functionName: "harvestStrategyYield", args: [strategy], chainId: CHAIN_ID })} disabled={disabled || busy} className="mt-2 w-full rounded-lg border border-emerald-800 px-4 py-2 text-sm font-medium text-emerald-200 disabled:opacity-40"><BusyLabel busy={harvest.isPending || harvest.isConfirming}>{harvest.isPending ? "Confirm…" : harvest.isConfirming ? "Harvesting…" : "Harvest yield to vault"}</BusyLabel></button>}
+      {isOwner && (accruedYield.data ?? 0n) > 0n && <button type="button" onClick={() => harvest.writeContract({ address: vault, abi: treasuryVaultAbi, functionName: "harvestStrategyYield", args: [strategy], chainId: CHAIN_ID })} disabled={disabled || busy} className="neo-btn neo-btn-secondary mt-2 w-full"><BusyLabel busy={harvest.isPending || harvest.isConfirming}>{harvest.isPending ? "Confirm…" : harvest.isConfirming ? "Harvesting…" : "Harvest yield to vault"}</BusyLabel></button>}
       {nothingDeployed && (
-        <p className="mt-2 text-[11px] text-neutral-500">
+        <p className="mt-2 text-[11px] text-black/50">
           No capital deployed — surplus sits idle in the vault.
         </p>
       )}
@@ -137,9 +145,9 @@ export function StrategyCard({
         inputMode="decimal"
         disabled={!isOwner || disabled}
         title={hint}
-        className="mt-3 w-full rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-neutral-600 disabled:opacity-50"
+        className="neo-input cabinet mt-3 text-lg"
       />
-      {deployableCapital !== undefined && deployableCapital > 0n && <button type="button" onClick={() => setAmount(formatUnits(deployableCapital, decimals))} disabled={!isOwner || disabled} className="mt-2 text-xs font-semibold text-blue-700 underline underline-offset-2 disabled:opacity-40">Use safe maximum · {formatUSD(deployableCapital, decimals)}</button>}
+      {deployableCapital !== undefined && deployableCapital > 0n && <button type="button" onClick={() => setAmount(formatUnits(deployableCapital, decimals))} disabled={!isOwner || disabled} className="mt-2 text-xs font-bold text-black underline decoration-2 underline-offset-2 hover:opacity-60 disabled:opacity-40">Use safe maximum · {formatUSD(deployableCapital, decimals)}</button>}
       <div className="mt-3 grid grid-cols-2 gap-2">
         <button
           onClick={() =>
@@ -154,7 +162,7 @@ export function StrategyCard({
           }
           disabled={!canAct || exceedsDeployable}
           title={hint}
-          className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+          className="neo-btn neo-btn-primary w-full"
         >
           <BusyLabel busy={deploy.isPending || deploy.isConfirming}>
             {deploy.isPending
@@ -177,7 +185,7 @@ export function StrategyCard({
           }
           disabled={!canAct || exceedsPosition || exceedsLiquidity}
           title={hint}
-          className="rounded-lg border border-neutral-700 px-4 py-2 text-sm font-medium text-neutral-200 disabled:opacity-40"
+          className="neo-btn neo-btn-secondary w-full"
         >
           <BusyLabel busy={recall.isPending || recall.isConfirming}>
             {recall.isPending
@@ -189,17 +197,17 @@ export function StrategyCard({
         </button>
       </div>
       {exceedsDeployable && (
-        <p className="mt-2 text-xs text-red-400">
+        <p className="mt-2 text-xs font-bold text-[#ef4444]">
           Deploy exceeds deployable capital ({formatUSD(deployableCapital, decimals)}).
         </p>
       )}
       {exceedsPosition && (
-        <p className="mt-2 text-xs text-red-400">
+        <p className="mt-2 text-xs font-bold text-[#ef4444]">
           Recall exceeds deployed position ({formatUSD(position.data, decimals)}).
         </p>
       )}
       {exceedsLiquidity && !exceedsPosition && (
-        <p className="mt-2 text-xs text-red-400">
+        <p className="mt-2 text-xs font-bold text-[#ef4444]">
           Recall exceeds currently withdrawable strategy liquidity ({formatUSD(liquidity.data, decimals)}).
         </p>
       )}

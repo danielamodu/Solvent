@@ -29,11 +29,12 @@ export function Spinner({ className }: { className?: string }) {
   );
 }
 
-/** Animated grey placeholder shown while an on-chain read is pending. */
+/** Animated placeholder shown while an on-chain read is pending. Uses the
+ *  current text colour at low opacity so it reads on white cards or dark bars. */
 export function Skeleton({ className }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded bg-neutral-800 ${className ?? "h-6 w-24"}`}
+      className={`animate-pulse bg-current/10 ${className ?? "h-7 w-28"}`}
       aria-hidden="true"
     />
   );
@@ -74,17 +75,23 @@ export function TxFeedback({
   if (!hash && !errorMessage && !cancelled) return null;
 
   return (
-    <div className={`mt-2 space-y-1 text-xs ${className ?? ""}`}>
-      {cancelled && <p className="text-neutral-400">Transaction cancelled.</p>}
+    <div className={`mt-3 space-y-2 text-xs ${className ?? ""}`}>
+      {cancelled && (
+        <p className="font-bold uppercase tracking-wide text-black/50">
+          Transaction cancelled.
+        </p>
+      )}
       {errorMessage && (
-        <p className="break-words text-red-400">{errorMessage}</p>
+        <p className="break-words border-2 border-[#ef4444] bg-[#ef4444]/10 px-3 py-2 font-bold text-[#ef4444]">
+          {errorMessage}
+        </p>
       )}
       {hash && (
         <a
           href={arbiscanTx(hash)}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-neutral-400 underline decoration-neutral-700 underline-offset-2 transition-colors hover:text-neutral-200"
+          className="inline-flex items-center gap-1 font-bold uppercase tracking-wide text-black underline decoration-2 underline-offset-2 transition-opacity hover:opacity-60"
         >
           {isConfirmed ? "Confirmed" : "Pending"} · View on Arbiscan ↗
         </a>

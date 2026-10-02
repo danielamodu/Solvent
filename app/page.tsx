@@ -1,86 +1,212 @@
-import Link from "next/link";
-import { SolventFooter, SolventNav } from "./components/SolventNav";
+"use client";
 
-const principles = [
-  { index: "01", title: "Record the promise", copy: "Put payment commitments onchain before treasury funds are put to work." },
-  { index: "02", title: "Keep it protected", copy: "The registry reserves the required liquidity and counts pending obligations against deployable capital." },
-  { index: "03", title: "Move with context", copy: "Review idle funds, strategy positions, and upcoming payments from one treasury view." },
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ArrowUpRight, AtSign, ChevronDown, Droplets, Eye, Globe, LayoutDashboard, ListTodo, MessageCircle, PenTool, Rocket, Shield, ShieldCheck, TrendingUp, Zap, type LucideIcon } from "lucide-react";
+
+const whyCards: { icon: LucideIcon; title: string; body: string }[] = [
+  { icon: Eye, title: "Obligation awareness", body: "Know exactly what you owe and when. Real-time tracking of every commitment, so you never double-spend liquidity." },
+  { icon: Zap, title: "Capital efficiency", body: "Move only what is free. Maximize utilization while meeting all obligations — never let the treasury sit idle." },
+  { icon: TrendingUp, title: "Yield optimization", body: "Turn idle capital into revenue. Deploy available liquidity into principal-only strategies within safe limits." },
+];
+const productCards: { icon: LucideIcon; title: string; body: string; bg: string }[] = [
+  { icon: PenTool, title: "Record the promise", body: "Log every commitment before it hits the ledger. Solvent ensures you never deploy capital already spoken for.", bg: "bg-[#ffe17c]" },
+  { icon: ShieldCheck, title: "Keep it protected", body: "Liquidity is ring-fenced by reserve and due dates, with real-time on-chain reserve enforcement.", bg: "bg-white" },
+  { icon: ArrowUpRight, title: "Move with context", body: "Only deploy what is truly free. The protocol computes your safe maximum deployment limit automatically.", bg: "bg-[#b7c6c2]" },
+];
+const steps = [
+  { n: 1, title: "Connect wallet", body: "Integrate your DAO treasury or multisig on Arbitrum Sepolia.", dark: true },
+  { n: 2, title: "Track obligations", body: "Record upcoming payments, locks, and operational reserves.", dark: false },
+  { n: 3, title: "Deploy capital", body: "Allocate only unencumbered capital into strategies.", dark: true },
+  { n: 4, title: "Stay solvent", body: "Watch your net balance grow while remaining fully covered.", dark: false },
+];
+const views: { icon: LucideIcon; title: string; body: string; href: string; bg: string }[] = [
+  { icon: LayoutDashboard, title: "Dashboard", body: "The centralized overview with real-time health badges.", href: "/dashboard", bg: "bg-white" },
+  { icon: ListTodo, title: "Obligations", body: "Record or settle commitments. Managing promises.", href: "/obligations", bg: "bg-white" },
+  { icon: Droplets, title: "Liquidity", body: "Coverage and shortfall monitors across time.", href: "/liquidity", bg: "bg-[#ffe17c]" },
+  { icon: Rocket, title: "Deploy", body: "Put capital to work without risking promises.", href: "/deploy", bg: "bg-[#b7c6c2]" },
+];
+const faqs = [
+  { q: "What is obligation-aware treasury management?", a: "A framework that prioritizes liabilities over assets. Solvent tracks future commitments so you only deploy capital that isn't already promised elsewhere." },
+  { q: "How does Solvent protect liquidity?", a: "Protected liquidity equals the reserve requirement plus all pending obligations. Deployable capital is what remains after protected funds and existing deployments." },
+  { q: "What are the security measures?", a: "Solvent is non-custodial. Owner-only actions are enforced on-chain by the vault; the app only reads and submits transactions for your wallet to sign." },
+  { q: "Which network is this?", a: "Solvent currently runs on the Arbitrum Sepolia testnet. Test tokens and mock strategy positions have no real-world value." },
+  { q: "Does the strategy generate yield?", a: "The configured MockStrategy is a principal-only test adapter — it does not generate yield and represents no external protocol or APY." },
 ];
 
-export default function Home() {
-  return (
-    <main className="marketing-page">
-      <SolventNav marketing />
-      <section className="marketing-hero">
-        <div className="hero-grid-texture" aria-hidden="true" />
-        <div className="marketing-hero-inner">
-          <div className="hero-copy">
-            <p className="eyebrow"><span className="eyebrow-line" /> Onchain treasury management</p>
-            <h1>Know what you owe.<br /><em>Move what is free.</em></h1>
-            <p className="hero-description">Solvent gives teams a clear view of payment commitments, protected liquidity, and capital available to deploy.</p>
-            <div className="hero-actions">
-              <Link href="/connect" className="button button-lime">Connect a treasury <span aria-hidden="true">↗</span></Link>
-              <Link href="/dashboard" className="hero-text-link">Explore the app <span aria-hidden="true">→</span></Link>
+export default function LandingPage() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return <div className="flex min-h-screen flex-col bg-white text-black">
+    <header className={`fixed z-50 flex items-center justify-between border-black bg-[#ffe17c] transition-all duration-300 ${scrolled ? "left-1/2 top-5 h-16 w-[92%] max-w-[1100px] -translate-x-1/2 rounded-2xl border-2 px-5 shadow-[4px_4px_0_0_#000] backdrop-blur" : "left-0 right-0 top-0 h-20 border-b-2 px-5 md:px-10"}`}>
+      <Link href="/" className="flex items-center gap-2"><span className="grid h-9 w-9 place-items-center border-2 border-black bg-black text-[#ffe17c]"><Zap size={18} /></span><span className="cabinet text-xl uppercase tracking-tight">Solvent</span></Link>
+      <nav className="hidden items-center gap-8 text-sm font-bold uppercase tracking-wide md:flex"><a href="#product" className="hover:opacity-60">Product</a><a href="#how" className="hover:opacity-60">How it works</a><a href="#app" className="hover:opacity-60">App</a></nav>
+      <Link href="/onboarding" className="neo-btn neo-btn-primary">Connect wallet</Link>
+    </header>
+
+    <main className="flex-1">
+      <section className="dot-pattern relative overflow-hidden bg-[#ffe17c] px-5 pb-24 pt-36 md:px-10">
+        <div className="mx-auto grid max-w-[1280px] items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
+          <div>
+            <span className="badge inline-flex items-center gap-2 border-2 border-black bg-black text-[#ffe17c]"><span className="h-2 w-2 rounded-full bg-[#ffe17c]" />New · Obligation-aware treasury control</span>
+            <h1 className="cabinet mt-6 text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl md:text-7xl">Know what you owe.<br /><span className="text-transparent [-webkit-text-stroke:2px_#000]">Move what is free.</span></h1>
+            <p className="mt-6 max-w-xl text-lg leading-7 text-black/70">Solvent tracks every treasury commitment on-chain, protects the liquidity you need, and tells you the exact capital you can safely deploy.</p>
+            <div className="mt-9 flex flex-wrap gap-4">
+              <Link href="/onboarding" className="neo-btn neo-btn-primary px-7 py-4 text-base">Connect wallet <ArrowUpRight size={18} /></Link>
+              <Link href="/dashboard" className="neo-btn neo-btn-secondary px-7 py-4 text-base">View dashboard</Link>
             </div>
-            <div className="hero-footnote"><span className="status-dot" /> Arbitrum Sepolia testnet <span className="footnote-divider">/</span> Owner controlled</div>
           </div>
-          <div className="hero-visual" aria-label="Illustrative treasury dashboard preview">
-            <div className="preview-orbit orbit-one" />
-            <div className="preview-orbit orbit-two" />
-            <div className="preview-window">
-              <div className="preview-topline"><span>WORKSPACE / TREASURY</span><span className="preview-live"><i /> CONNECTED</span></div>
-              <div className="preview-heading"><div><span className="preview-label">TREASURY OVERVIEW</span><h2>Operations vault</h2></div><span className="preview-chain">ARB / TESTNET</span></div>
-              <div className="preview-value-row"><div><span>Total assets</span><strong>Onchain</strong></div><div><span>Free to deploy</span><strong>Guarded</strong></div></div>
-              <div className="preview-allocation"><div className="allocation-heading"><span>Capital allocation</span><span>Live contract data</span></div><div className="allocation-bar"><i /><i /><i /><i /></div><div className="allocation-legend"><span><i /> Reserve</span><span><i /> Obligations</span><span><i /> Deployed</span><span><i /> Available</span></div></div>
-              <div className="preview-obligation"><div className="obligation-marker" /><div><span>NEXT COMMITMENT</span><strong>Payment readiness</strong></div><b>Review</b></div>
-              <div className="preview-bottom"><span>Data loads from your connected treasury</span><span className="preview-arrow">↗</span></div>
+          <div className="brutalist-border brutalist-shadow-lg bg-white p-5">
+            <div className="flex items-center justify-between border-b-2 border-black pb-3"><span className="neo-label">Treasury health</span><span className="badge bg-[#10b981] text-white">345% covered</span></div>
+            <div className="mt-4 border-2 border-black bg-[#ffe17c] p-4"><div className="neo-label">Safe to deploy</div><div className="cabinet mt-1 text-3xl tabular-nums">$284,500</div></div>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className="border-2 border-black p-3"><div className="neo-label">Total assets</div><div className="cabinet mt-1 text-lg tabular-nums">$500,000</div></div>
+              <div className="border-2 border-black p-3"><div className="neo-label">Protected</div><div className="cabinet mt-1 text-lg tabular-nums">$215,500</div></div>
             </div>
-            <div className="visual-caption"><span>01</span><span>Commitments first. Capital second.</span></div>
+            <div className="mt-3 h-3 w-full border-2 border-black bg-white"><div className="h-full bg-[#10b981]" style={{ width: "72%" }} /></div>
           </div>
         </div>
-        <div className="hero-index"><span>01 — 03</span><span>SCROLL TO EXPLORE</span></div>
       </section>
-
-      <section id="product" className="product-intro">
-        <div className="section-marker"><span>01</span><span>THE PRODUCT</span></div>
-        <div className="product-intro-grid"><h2>A treasury should know its obligations before it reaches for yield.</h2><p>Solvent connects payment records to vault liquidity, so a team can see what is committed, what is deployed, and what the contracts consider available.</p></div>
-        <div id="how-it-works" className="principle-list">
-          {principles.map((item) => <article className="principle-row" key={item.index}><span className="principle-index">{item.index}</span><h3>{item.title}</h3><p>{item.copy}</p><span className="principle-arrow" aria-hidden="true">↗</span></article>)}
+      <div className="overflow-hidden border-y-2 border-black bg-white py-4"><div className="animate-marquee"><Marquee /><Marquee /></div></div>
+      <section className="bg-[#171e19] px-5 py-24 text-white md:px-10">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="neo-label text-[#b7c6c2]">Why Solvent</div>
+          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl">Treasury management that starts with liabilities</h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {whyCards.map(({ icon: Icon, title, body }) => <div key={title} className="accent-bar border-2 border-black bg-white p-7 text-black shadow-[8px_8px_0_0_#000]">
+              <span className="grid h-12 w-12 place-items-center border-2 border-black bg-[#ffe17c]"><Icon size={22} /></span>
+              <h3 className="cabinet mt-5 text-xl uppercase tracking-tight">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-black/60">{body}</p>
+            </div>)}
+          </div>
         </div>
       </section>
 
-      <section className="capital-section">
-        <div className="capital-copy">
-          <div className="section-marker"><span>02</span><span>CAPITAL, MADE LEGIBLE</span></div>
-          <h2>Every asset has a job.</h2>
-          <p>Solvent separates the balances a treasury needs to honor from the capital it can put to work. The vault calculates deployable capital onchain after protected liquidity and existing strategy positions are accounted for.</p>
-          <Link href="/liquidity" className="section-link">Explore liquidity <span aria-hidden="true">↗</span></Link>
+      <section id="product" className="bg-white px-5 py-24 md:px-10">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="neo-label">The product</div>
+          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl">Record the promise. Protect it. Deploy the rest.</h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {productCards.map(({ icon: Icon, title, body, bg }) => <div key={title} className={`border-2 border-black p-7 shadow-[8px_8px_0_0_#000] ${bg}`}>
+              <span className="grid h-12 w-12 place-items-center border-2 border-black bg-black text-[#ffe17c]"><Icon size={22} /></span>
+              <h3 className="cabinet mt-5 text-xl uppercase tracking-tight">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-black/70">{body}</p>
+            </div>)}
+          </div>
         </div>
-        <div className="capital-visual" aria-label="Illustration of treasury capital categories">
-          <div className="capital-visual-head"><span>VAULT BALANCE</span><span>CONTRACT VIEW</span></div>
-          <div className="capital-flow"><div className="flow-total"><span>Total assets</span><b>From the vault</b></div><div className="flow-branches"><div><i className="flow-swatch reserve-swatch"/><span><b>Reserve</b><small>Required liquidity</small></span></div><div><i className="flow-swatch obligation-swatch"/><span><b>Obligations</b><small>Pending payments</small></span></div><div><i className="flow-swatch deployed-swatch"/><span><b>Deployed</b><small>Strategy position</small></span></div><div><i className="flow-swatch free-swatch"/><span><b>Deployable</b><small>Available by contract rule</small></span></div></div></div>
-          <p className="capital-footnote">Illustrative categories. Balances load from the selected treasury.</p>
+      </section>
+      <section id="how" className="dot-pattern bg-[#ffe17c] px-5 py-24 md:px-10">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="neo-label">How it works</div>
+          <h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl">Four steps to total clarity</h2>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {steps.map(({ n, title, body, dark }) => <div key={n} className={`border-2 border-black p-6 shadow-[8px_8px_0_0_#000] ${dark ? "bg-[#171e19] text-white" : "bg-white text-black"}`}>
+              <span className={`cabinet grid h-12 w-12 place-items-center border-2 text-xl ${dark ? "border-white bg-[#ffe17c] text-black" : "border-black bg-black text-[#ffe17c]"}`}>{n}</span>
+              <h3 className="cabinet mt-5 text-lg uppercase tracking-tight">{title}</h3>
+              <p className={`mt-2 text-sm leading-6 ${dark ? "text-white/60" : "text-black/60"}`}>{body}</p>
+            </div>)}
+          </div>
         </div>
       </section>
 
-      <section className="workspace-section">
-        <div className="workspace-heading"><div><div className="section-marker"><span>03</span><span>FOUR VIEWS, ONE TREASURY</span></div><h2>From obligation to action.</h2></div><p>Each workspace view answers a different treasury question, with wallet actions available where the connected account has permission.</p></div>
-        <div className="workspace-grid">
-          <Link href="/dashboard" className="workspace-card overview-card"><span className="workspace-number">01 / OVERVIEW</span><h3>What is in the vault?</h3><p>Review total assets, protected liquidity, deployed funds, and current payment readiness.</p><span className="workspace-arrow">Open overview ↗</span></Link>
-          <Link href="/obligations" className="workspace-card"><span className="workspace-number">02 / OBLIGATIONS</span><h3>What is due?</h3><p>Record commitments, see upcoming due dates, and check how obligations affect protected capital.</p><span className="workspace-arrow">Review commitments ↗</span></Link>
-          <Link href="/liquidity" className="workspace-card"><span className="workspace-number">03 / LIQUIDITY</span><h3>What is available?</h3><p>Understand reserve requirements, pending obligations, idle balance, and strategy liquidity.</p><span className="workspace-arrow">Inspect liquidity ↗</span></Link>
-          <Link href="/deploy" className="workspace-card"><span className="workspace-number">04 / DEPLOYMENT</span><h3>What can move?</h3><p>Review the onchain deployment limit and use the connected strategy controls when permitted.</p><span className="workspace-arrow">View deployment ↗</span></Link>
+      <section className="bg-[#171e19] px-5 py-24 text-white md:px-10">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="neo-label text-[#b7c6c2]">Capital legibility</div>
+          <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl">Every dollar has a job</h2>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <Primitive label="Reserve" sub="Operational floor" bg="bg-[#b7c6c2]" />
+            <Primitive label="Obligations" sub="Promised out" bg="bg-[#ffe17c]" />
+            <Primitive label="Deployed" sub="At work" bg="bg-white" />
+            <Primitive label="Deployable" sub="Safe to move" bg="bg-[#ffe17c]" primary />
+          </div>
+          <p className="mt-10 max-w-2xl text-sm leading-6 text-[#b7c6c2]">Deployable = Total assets − Reserve − Pending obligations − Already deployed. The invariant is enforced on-chain, every block.</p>
+        </div>
+      </section>
+      <section id="app" className="bg-white px-5 py-24 md:px-10">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="neo-label">The workspace</div>
+          <h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl">Four views, one source of truth</h2>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {views.map(({ icon: Icon, title, body, href, bg }) => <Link key={title} href={href} className={`group border-2 border-black p-6 shadow-[8px_8px_0_0_#000] transition-transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#000] ${bg}`}>
+              <span className="grid h-12 w-12 place-items-center border-2 border-black bg-black text-[#ffe17c]"><Icon size={22} /></span>
+              <h3 className="cabinet mt-5 flex items-center gap-1 text-lg uppercase tracking-tight">{title} <ArrowUpRight size={16} className="opacity-0 transition-opacity group-hover:opacity-100" /></h3>
+              <p className="mt-2 text-sm leading-6 text-black/60">{body}</p>
+            </Link>)}
+          </div>
         </div>
       </section>
 
-      <section className="setup-section">
-        <div className="section-marker"><span>04</span><span>GETTING STARTED</span></div>
-        <div className="setup-heading"><h2>Start with a treasury<br />you can verify.</h2><Link href="/connect" className="button button-dark">Connect a treasury <span aria-hidden="true">↗</span></Link></div>
-        <div className="setup-steps"><article><span>01</span><div><h3>Connect a wallet</h3><p>Use a wallet or Safe on Arbitrum Sepolia. Reads remain public, while owner actions require the correct account and network.</p></div></article><article><span>02</span><div><h3>Select or create a vault</h3><p>Connect an existing vault, or create a testnet treasury through the configured factory.</p></div></article><article><span>03</span><div><h3>Review before acting</h3><p>Check obligations and liquidity first. The vault enforces the deployable limit when strategy capital moves.</p></div></article></div>
+      <section className="bg-[#b7c6c2] px-5 py-24 md:px-10">
+        <div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[.8fr_1.2fr]">
+          <div><div className="neo-label">FAQ</div><h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl">Questions, answered</h2><p className="mt-4 text-sm leading-6 text-black/70">Everything you need to know about obligation-aware treasury management on Solvent.</p></div>
+          <div className="space-y-4">
+            {faqs.map(({ q, a }) => <details key={q} className="border-2 border-black bg-white p-5 shadow-[6px_6px_0_0_#000] [&_svg]:open:rotate-180">
+              <summary className="flex cursor-pointer items-center justify-between gap-4 font-bold uppercase tracking-tight marker:content-none"><span>{q}</span><ChevronDown size={18} className="shrink-0 transition-transform" /></summary>
+              <p className="mt-3 text-sm leading-6 text-black/60">{a}</p>
+            </details>)}
+          </div>
+        </div>
       </section>
-
-      <section className="marketing-close"><div className="section-marker"><span>05</span><span>START WITH THE TREASURY</span></div><div className="close-grid"><h2>See the whole picture<br /><em>before capital moves.</em></h2><div><p>Connect a treasury to review its onchain balances and commitments. Owner actions stay gated by the connected wallet and the contracts.</p><Link href="/connect" className="button button-dark">Open Solvent <span aria-hidden="true">↗</span></Link></div></div><div className="testnet-note"><span>TESTNET ENVIRONMENT</span><p>Solvent currently runs on Arbitrum Sepolia. Test tokens and mock strategy positions have no real-world value.</p></div></section>
-      <SolventFooter marketing />
+      <section className="dot-pattern bg-[#ffe17c] px-5 py-28 text-center md:px-10">
+        <div className="mx-auto max-w-[820px]">
+          <h2 className="cabinet text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl">Deploy with total clarity.</h2>
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-7 text-black/70">Connect your treasury, record what you owe, and move only the capital that is truly free.</p>
+          <Link href="/onboarding" className="neo-btn neo-btn-primary mt-9 inline-flex px-8 py-4 text-base">Launch application <ArrowUpRight size={18} /></Link>
+        </div>
+      </section>
     </main>
-  );
+
+    <footer className="bg-[#171e19] px-5 py-16 text-white md:px-10">
+      <div className="mx-auto grid max-w-[1280px] gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+        <div>
+          <div className="flex items-center gap-2"><span className="grid h-9 w-9 place-items-center border-2 border-white bg-[#ffe17c] text-black"><Zap size={18} /></span><span className="cabinet text-xl uppercase tracking-tight">Solvent</span></div>
+          <p className="mt-4 max-w-xs text-sm leading-6 text-[#b7c6c2]">Obligation-aware treasury management. Know what you owe, move what is free.</p>
+          <div className="mt-5 flex gap-3">
+            {[Globe, AtSign, MessageCircle].map((Icon, i) => <a key={i} href="#" aria-label="social" className="grid h-10 w-10 place-items-center border-2 border-white/30 hover:border-[#ffe17c] hover:text-[#ffe17c]"><Icon size={18} /></a>)}
+          </div>
+        </div>
+        <div>
+          <div className="neo-label text-[#b7c6c2]">Workspace</div>
+          <ul className="mt-4 space-y-2 text-sm text-[#b7c6c2]">
+            {views.map(v => <li key={v.href}><Link href={v.href} className="hover:text-white">{v.title}</Link></li>)}
+          </ul>
+        </div>
+        <div>
+          <div className="neo-label text-[#b7c6c2]">Get started</div>
+          <ul className="mt-4 space-y-2 text-sm text-[#b7c6c2]">
+            <li><Link href="/onboarding" className="hover:text-white">Onboarding</Link></li>
+            <li><Link href="/connect" className="hover:text-white">Connect treasury</Link></li>
+            <li><a href="#how" className="hover:text-white">How it works</a></li>
+            <li><a href="#app" className="hover:text-white">The workspace</a></li>
+          </ul>
+        </div>
+      </div>
+      <div className="mx-auto mt-12 flex max-w-[1280px] flex-col items-center justify-between gap-3 border-t-2 border-white/15 pt-6 text-xs text-[#b7c6c2] sm:flex-row">
+        <span>© 2026 Solvent. Testnet software — no real-world value.</span>
+        <span className="inline-flex items-center gap-2"><Shield size={14} /> Arbitrum Sepolia testnet</span>
+      </div>
+    </footer>
+  </div>;
 }
+
+function Marquee() {
+  const words = ["Obligation-aware", "Non-custodial", "On-chain reserve", "Deployable capital", "Coverage tracking", "Owner-only actions"];
+  return <div className="flex shrink-0 items-center">
+    {words.map((w, i) => <span key={i} className="cabinet flex items-center gap-6 whitespace-nowrap px-6 text-lg uppercase tracking-tight text-black/70"><span>{w}</span><span className="text-[#ffe17c]">●</span></span>)}
+  </div>;
+}
+
+function Primitive({ label, sub, bg, primary = false }: { label: string; sub: string; bg: string; primary?: boolean }) {
+  return <div className={`border-2 border-black p-6 text-black shadow-[8px_8px_0_0_#000] ${bg}`}>
+    <div className={`grid h-20 place-items-center border-2 border-black ${primary ? "bg-black text-[#ffe17c]" : "bg-white/60"}`}><span className="cabinet text-2xl uppercase tracking-tight">{primary ? "✓" : label[0]}</span></div>
+    <h3 className="cabinet mt-4 text-lg uppercase tracking-tight">{label}</h3>
+    <p className="mt-1 text-xs font-bold uppercase tracking-wide text-black/50">{sub}</p>
+  </div>;
+}
+
