@@ -9,7 +9,7 @@ import { useObligations } from "@/lib/useObligations";
 import { formatUSD } from "@/lib/format";
 import { LiquidityTimeline } from "@/app/components/LiquidityTimeline";
 import { ShortfallAlert } from "@/app/components/ShortfallAlert";
-import { SolventFooter, SolventNav } from "@/app/components/SolventNav";
+import { WorkspaceFooter, WorkspaceHeader } from "@/app/components/Workspace";
 
 export default function LiquidityPage() {
   const { address, isConnected, chainId } = useAccount();
@@ -38,11 +38,11 @@ export default function LiquidityPage() {
   const buckets = [7, 14, 30].map(days => pending.filter(o => Number(o.dueAt) <= now + days * 86400 && Number(o.dueAt) > now + (days === 7 ? 0 : [7, 14, 30][[7, 14, 30].indexOf(days) - 1] * 86400)).reduce((sum, o) => sum + o.amount, 0n));
   const idle = available.data ?? 0n;
 
-  return <main className="min-h-screen bg-slate-50 text-slate-900">
-    <SolventNav active="liquidity" />
-    <section className="solvent-dashboard mx-auto max-w-[1280px] px-5 py-10 lg:px-8">
-      <div className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-blue-700">Treasury controls</p><h1 className="display-font mt-2 text-4xl font-extrabold sm:text-5xl">Liquidity reserve</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Funds protected for upcoming obligations and the treasury’s reserve requirement stay out of deployment capacity.</p></div><Link href="/obligations" className="rounded-full border border-blue-700 px-5 py-3 text-sm font-bold text-blue-700 hover:bg-blue-50">Manage obligations</Link></div>
-      {!configured ? <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 text-center"><h2 className="font-bold">Connect a treasury to see its reserve</h2><Link href="/connect" className="mt-4 inline-flex rounded-full bg-blue-700 px-5 py-3 text-sm font-bold text-white">Connect treasury</Link></div> : <>
+  return <div className="workspace-shell flex min-h-screen flex-col">
+    <WorkspaceHeader active="liquidity" />
+    <main className="dot-pattern-light mx-auto w-full max-w-[1280px] flex-1 px-5 py-10 md:px-10">
+      <div className="flex flex-wrap items-end justify-between gap-5"><div><div className="neo-label text-[#b7c6c2]">Treasury controls</div><h1 className="cabinet mt-2 text-4xl uppercase tracking-tight text-white sm:text-5xl">Liquidity reserve</h1><p className="mt-3 max-w-2xl text-sm text-[#b7c6c2]">Funds protected for upcoming obligations and the treasury&rsquo;s reserve requirement stay out of deployment capacity.</p></div><Link href="/obligations" className="neo-btn neo-btn-secondary shrink-0">Manage obligations</Link></div>
+      {!configured ? <div className="neo-card-lg mt-8 p-8 text-center"><h2 className="cabinet text-lg uppercase tracking-tight">Connect a treasury to see its reserve</h2><Link href="/connect" className="neo-btn neo-btn-primary mt-5 inline-flex">Connect treasury</Link></div> : <>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Metric label="Total assets" value={formatUSD(totalAssets.data, decimals)} />
           <Metric label="Reserved" value={formatUSD(protectedLiquidity.data, decimals)} />
@@ -54,18 +54,19 @@ export default function LiquidityPage() {
             <ShortfallAlert protectedLiquidity={protectedLiquidity.data} availableBalance={available.data} totalDeployed={deployed.data} strategyLiquidity={strategyLiquidity.data} decimals={decimals} isOwner={isOwner && canInteract} onChange={refresh} />
           </div>
           <aside className="space-y-5">
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[.16em] text-blue-700">Coverage timeline</p><h2 className="mt-2 text-xl font-bold">Payments ahead</h2></div><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">{coverage !== null && coverage >= 100 ? "Healthy" : "Review"}</span></div>
-              <div className="mt-5 space-y-4">{["Next 7 days", "Days 8–14", "Days 15–30"].map((label, i) => { const amount = buckets[i] ?? 0n; const covered = amount === 0n || idle >= amount; return <div key={label} className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0"><div><p className="text-sm font-semibold">{label}</p><p className="mt-1 text-xs text-slate-500">{covered ? "Covered by current idle balance" : "Needs liquidity review"}</p></div><div className="text-right"><p className="text-sm font-bold">{formatUSD(amount, decimals)}</p><p className={`mt-1 text-[10px] font-bold ${covered ? "text-emerald-700" : "text-amber-700"}`}>{covered ? "COVERED" : "REVIEW"}</p></div></div>; })}</div>
+            <section className="neo-card p-6"><div className="flex items-start justify-between gap-3"><div><div className="neo-label">Coverage timeline</div><h2 className="cabinet mt-1 text-xl uppercase tracking-tight">Payments ahead</h2></div><span className={`badge ${coverage !== null && coverage >= 100 ? "bg-[#10b981] text-white" : "bg-[#ffe17c] text-black"}`}>{coverage !== null && coverage >= 100 ? "Healthy" : "Review"}</span></div>
+              <div className="mt-5 space-y-4">{["Next 7 days", "Days 8–14", "Days 15–30"].map((label, i) => { const amount = buckets[i] ?? 0n; const covered = amount === 0n || idle >= amount; return <div key={label} className="flex items-center justify-between gap-3 border-b-2 border-black/10 pb-3 last:border-0"><div><p className="text-sm font-bold text-black">{label}</p><p className="mt-1 text-xs text-black/50">{covered ? "Covered by current idle balance" : "Needs liquidity review"}</p></div><div className="text-right"><p className="cabinet text-sm tabular-nums text-black">{formatUSD(amount, decimals)}</p><p className={`mt-1 text-[10px] font-bold ${covered ? "text-[#10b981]" : "text-[#b45309]"}`}>{covered ? "COVERED" : "REVIEW"}</p></div></div>; })}</div>
             </section>
-            <section className="rounded-3xl border border-blue-100 bg-blue-50 p-6"><h2 className="text-sm font-bold text-blue-900">Reserve requirement</h2><p className="mt-2 text-sm leading-6 text-blue-900/75">{formatUSD(reserve.data, decimals)} is protected by the registry. This contract sets the reserve when the treasury is created; to change it, create a treasury with the desired reserve.</p><Link href="/connect" className="mt-4 inline-flex text-sm font-bold text-blue-800 underline underline-offset-4">Treasury setup →</Link></section>
+            <section className="accent-bar neo-card p-6"><h2 className="cabinet text-sm uppercase tracking-tight">Reserve requirement</h2><p className="mt-2 text-sm leading-6 text-black/70">{formatUSD(reserve.data, decimals)} is protected by the registry. This contract sets the reserve when the treasury is created; to change it, create a treasury with the desired reserve.</p><Link href="/connect" className="mt-4 inline-flex text-sm font-bold uppercase tracking-wide text-black underline decoration-2 underline-offset-4 hover:opacity-70">Treasury setup →</Link></section>
           </aside>
         </div>
       </>}
-    </section>
-    <SolventFooter />
-  </main>;
+    </main>
+    <WorkspaceFooter />
+  </div>;
 }
 
 function Metric({ label, value, primary = false }: { label: string; value: string; primary?: boolean }) {
-  return <div className={`rounded-3xl border p-5 shadow-sm ${primary ? "border-blue-700 bg-blue-700 text-white" : "border-slate-200 bg-white"}`}><p className={`text-xs font-semibold ${primary ? "text-blue-100" : "text-slate-500"}`}>{label}</p><p className={`mt-2 text-2xl font-extrabold tabular-nums ${primary ? "text-white" : "text-blue-700"}`}>{value}</p></div>;
+  if (primary) return <div className="border-2 border-black bg-[#ffe17c] p-5 shadow-[4px_4px_0_0_#000]"><div className="neo-label">{label}</div><div className="mt-1 cabinet text-2xl tabular-nums text-black">{value}</div></div>;
+  return <div className="neo-card p-5"><div className="neo-label">{label}</div><div className="mt-1 cabinet text-2xl tabular-nums text-black">{value}</div></div>;
 }

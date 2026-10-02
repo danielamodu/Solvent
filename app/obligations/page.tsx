@@ -7,7 +7,7 @@ import { useTreasury } from "@/lib/treasury-context";
 import { useObligations } from "@/lib/useObligations";
 import { formatUSD } from "@/lib/format";
 import { ObligationCard } from "@/app/components/ObligationCard";
-import { SolventFooter, SolventNav } from "@/app/components/SolventNav";
+import { WorkspaceFooter, WorkspaceHeader } from "@/app/components/Workspace";
 
 export default function ObligationsPage() {
   const { address, isConnected, chainId } = useAccount();
@@ -25,12 +25,12 @@ export default function ObligationsPage() {
   const totalCount = obligations.length;
   const overdueCount = obligations.filter(o => o.status === 0 && Number(o.dueAt) < Date.now() / 1000).length;
 
-  return <main className="min-h-screen bg-slate-50 text-slate-900">
-    <SolventNav active="obligations" />
-    <section className="solvent-dashboard mx-auto max-w-[1280px] px-5 py-10 lg:px-8">
+  return <div className="workspace-shell flex min-h-screen flex-col">
+    <WorkspaceHeader active="obligations" />
+    <main className="dot-pattern-light mx-auto w-full max-w-[1280px] flex-1 px-5 py-10 md:px-10">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-        <div><p className="text-xs font-bold uppercase tracking-[.18em] text-blue-700">Treasury commitments</p><h1 className="display-font mt-2 text-4xl font-extrabold sm:text-5xl">Upcoming obligations</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Record payments before they are due. Each pending obligation reduces capital available for strategy deployment.</p></div>
-        {configured && <a href="#create-obligation" className="rounded-full bg-blue-700 px-5 py-3 text-sm font-bold text-white hover:bg-blue-800">Create obligation <span aria-hidden>＋</span></a>}
+        <div><div className="neo-label text-[#b7c6c2]">Treasury commitments</div><h1 className="cabinet mt-2 text-4xl uppercase tracking-tight text-white sm:text-5xl">Upcoming obligations</h1><p className="mt-3 max-w-2xl text-sm text-[#b7c6c2]">Record payments before they are due. Each pending obligation reduces capital available for strategy deployment.</p></div>
+        {configured && <a href="#create-obligation" className="neo-btn neo-btn-accent shrink-0">Create obligation +</a>}
       </div>
       {!configured ? <EmptyTreasury /> : <>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -39,19 +39,19 @@ export default function ObligationsPage() {
           <Summary label="Overdue" value={String(overdueCount)} note={overdueCount ? "Owner action required" : "No overdue payments"} accent={overdueCount > 0} />
         </div>
         <div id="create-obligation" className="mt-8 grid gap-6 lg:grid-cols-[.7fr_1.3fr]">
-          <aside className="h-fit rounded-3xl border border-blue-100 bg-blue-700 p-6 text-white shadow-sm"><p className="text-xs font-bold uppercase tracking-[.16em] text-blue-100">Payment readiness</p><h2 className="display-font mt-3 text-3xl font-extrabold">Promises first.</h2><p className="mt-3 text-sm leading-6 text-blue-50">Before a payment is settled, the vault checks that enough idle liquidity is available. If funds are deployed, recall them first.</p><div className="mt-6 rounded-2xl bg-white/10 p-4"><p className="text-xs text-blue-100">Idle vault balance</p><p className="mt-1 text-2xl font-bold">{formatUSD(available.data, unit)}</p></div><Link href="/liquidity" className="mt-5 inline-flex text-sm font-bold text-white underline underline-offset-4">Review liquidity →</Link></aside>
+          <aside className="accent-bar h-fit border-2 border-black bg-[#b7c6c2] p-6 shadow-[8px_8px_0_0_#000]"><div className="neo-label">Payment readiness</div><h2 className="cabinet mt-2 text-2xl uppercase tracking-tight text-black">Promises first</h2><p className="mt-3 text-sm leading-6 text-black/70">Before a payment is settled, the vault checks that enough idle liquidity is available. If funds are deployed, recall them first.</p><div className="mt-6 border-2 border-black bg-white p-4"><div className="neo-label">Idle vault balance</div><div className="cabinet mt-1 text-2xl tabular-nums text-black">{formatUSD(available.data, unit)}</div></div><Link href="/liquidity" className="mt-5 inline-flex text-sm font-bold uppercase tracking-wide text-black underline decoration-2 underline-offset-4 hover:opacity-70">Review liquidity →</Link></aside>
           <ObligationCard decimals={unit} availableBalance={available.data} isOwner={isOwner} obligations={obligations} refetch={() => void refetch()} onChange={refresh} disabled={!canInteract} disabledReason={!isConnected ? "Connect your wallet" : "Switch to Arbitrum Sepolia"} />
         </div>
       </>}
-    </section>
-    <SolventFooter />
-  </main>;
+    </main>
+    <WorkspaceFooter />
+  </div>;
 }
 
 function Summary({ label, value, note, accent = false }: { label: string; value: string; note: string; accent?: boolean }) {
-  return <div className={`rounded-3xl border p-5 shadow-sm ${accent ? "border-red-100 bg-red-50" : "border-slate-200 bg-white"}`}><p className="text-xs font-semibold text-slate-500">{label}</p><p className={`mt-2 text-3xl font-extrabold tabular-nums ${accent ? "text-red-700" : "text-blue-700"}`}>{value}</p><p className="mt-1 text-xs text-slate-500">{note}</p></div>;
+  return <div className={`neo-card p-5 ${accent ? "border-l-4 border-l-[#ef4444]" : ""}`}><div className="neo-label">{label}</div><div className={`mt-1 cabinet text-3xl tabular-nums ${accent ? "text-[#ef4444]" : "text-black"}`}>{value}</div><p className="mt-1 text-xs text-black/50">{note}</p></div>;
 }
 
 function EmptyTreasury() {
-  return <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 text-center"><h2 className="text-lg font-bold">Connect a treasury to see obligations</h2><p className="mt-2 text-sm text-slate-600">Onchain commitments will appear here once a treasury is selected.</p><Link href="/connect" className="mt-5 inline-flex rounded-full bg-blue-700 px-5 py-3 text-sm font-bold text-white">Connect treasury</Link></div>;
+  return <div className="neo-card-lg mt-8 p-8 text-center"><h2 className="cabinet text-lg uppercase tracking-tight">Connect a treasury to see obligations</h2><p className="mt-2 text-sm text-black/60">Onchain commitments will appear here once a treasury is selected.</p><Link href="/connect" className="neo-btn neo-btn-primary mt-5 inline-flex">Connect treasury</Link></div>;
 }

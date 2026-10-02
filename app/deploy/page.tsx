@@ -6,7 +6,7 @@ import { CHAIN_ID, OBLIGATION_REGISTRY_ABI, treasuryVaultAbi } from "@/lib/contr
 import { useTreasury } from "@/lib/treasury-context";
 import { formatUSD } from "@/lib/format";
 import { StrategyCard } from "@/app/components/StrategyCard";
-import { SolventFooter, SolventNav } from "@/app/components/SolventNav";
+import { WorkspaceFooter, WorkspaceHeader } from "@/app/components/Workspace";
 
 export default function DeployPage() {
   const { address, isConnected, chainId } = useAccount();
@@ -23,29 +23,30 @@ export default function DeployPage() {
   const isOwner = Boolean(address && owner.data && address.toLowerCase() === owner.data.toLowerCase());
   const canInteract = isConnected && chainId === CHAIN_ID;
 
-  return <main className="min-h-screen bg-slate-50 text-slate-900">
-    <SolventNav active="deploy" />
-    <section className="solvent-dashboard mx-auto max-w-[1280px] px-5 py-10 lg:px-8">
-      <div><p className="text-xs font-bold uppercase tracking-[.18em] text-blue-700">Treasury actions</p><h1 className="display-font mt-2 text-4xl font-extrabold sm:text-5xl">Deploy capital.</h1><p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">Deploy idle vault assets only after reserve requirements and pending payment obligations are protected.</p></div>
-      {!configured ? <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 text-center"><h2 className="font-bold">Connect a treasury before deploying</h2><Link href="/connect" className="mt-4 inline-flex rounded-full bg-blue-700 px-5 py-3 text-sm font-bold text-white">Connect treasury</Link></div> : <>
+  return <div className="workspace-shell flex min-h-screen flex-col">
+    <WorkspaceHeader active="deploy" />
+    <main className="dot-pattern-light mx-auto w-full max-w-[1280px] flex-1 px-5 py-10 md:px-10">
+      <div><div className="neo-label text-[#b7c6c2]">Treasury actions</div><h1 className="cabinet mt-2 text-4xl uppercase tracking-tight text-white sm:text-5xl">Deploy capital</h1><p className="mt-3 max-w-3xl text-sm text-[#b7c6c2]">Deploy idle vault assets only after reserve requirements and pending payment obligations are protected.</p></div>
+      {!configured ? <div className="neo-card-lg mt-8 p-8 text-center"><h2 className="cabinet text-lg uppercase tracking-tight">Connect a treasury before deploying</h2><Link href="/connect" className="neo-btn neo-btn-primary mt-5 inline-flex">Connect treasury</Link></div> : <>
         <div className="mt-8 grid gap-4 sm:grid-cols-3"><Metric label="Safe deployment limit" value={formatUSD(deployable.data, decimals)} primary /><Metric label="Upcoming obligations" value={formatUSD(outstanding.data, decimals)} /><Metric label="Current strategy position" value={formatUSD(deployed.data, decimals)} /></div>
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
-          {treasury?.strategy ? <StrategyCard decimals={decimals} isOwner={isOwner} onChange={() => { void deployable.refetch(); void available.refetch(); void deployed.refetch(); }} deployableCapital={deployable.data} disabled={!canInteract} disabledReason={!isConnected ? "Connect your wallet" : "Switch to Arbitrum Sepolia"} /> : <div className="rounded-3xl border border-slate-200 bg-white p-7"><h2 className="text-lg font-bold">No strategy connected</h2><p className="mt-2 text-sm text-slate-600">Connect a strategy adapter that is wired to this vault and asset before deployment.</p></div>}
+          {treasury?.strategy ? <StrategyCard decimals={decimals} isOwner={isOwner} onChange={() => { void deployable.refetch(); void available.refetch(); void deployed.refetch(); }} deployableCapital={deployable.data} disabled={!canInteract} disabledReason={!isConnected ? "Connect your wallet" : "Switch to Arbitrum Sepolia"} /> : <div className="neo-card p-7"><h2 className="cabinet text-lg uppercase tracking-tight">No strategy connected</h2><p className="mt-2 text-sm text-black/60">Connect a strategy adapter that is wired to this vault and asset before deployment.</p></div>}
           <aside className="space-y-5">
-            <section className="rounded-3xl border border-blue-100 bg-blue-50 p-6"><p className="text-xs font-bold uppercase tracking-[.16em] text-blue-700">Guardrail active</p><h2 className="mt-2 text-xl font-bold text-slate-900">Promises remain protected.</h2><p className="mt-3 text-sm leading-6 text-slate-600">Deployable capital is computed onchain after subtracting protected liquidity and existing deployment positions.</p><div className="mt-5 space-y-3 border-t border-blue-100 pt-4"><Breakdown label="Idle vault balance" value={formatUSD(available.data, decimals)} /><Breakdown label="Protected liquidity" value={formatUSD(protectedLiquidity.data, decimals)} /><Breakdown label="Pending obligations" value={formatUSD(outstanding.data, decimals)} /></div></section>
-            <section className="rounded-3xl border border-amber-200 bg-amber-50 p-6"><h2 className="text-sm font-bold text-amber-900">Strategy information</h2><p className="mt-2 text-sm leading-6 text-amber-900/75">The configured MockStrategy is a test adapter that returns principal only. It does not generate yield. No APY or external protocol is represented here.</p><p className="mt-3 text-xs font-semibold text-amber-900">Available now: {formatUSD(deployable.data, decimals)}</p></section>
+            <section className="accent-bar neo-card p-6"><div className="neo-label">Guardrail active</div><h2 className="cabinet mt-1 text-xl uppercase tracking-tight">Promises remain protected</h2><p className="mt-3 text-sm leading-6 text-black/60">Deployable capital is computed onchain after subtracting protected liquidity and existing deployment positions.</p><div className="mt-5 space-y-3 border-t-2 border-black/10 pt-4"><Breakdown label="Idle vault balance" value={formatUSD(available.data, decimals)} /><Breakdown label="Protected liquidity" value={formatUSD(protectedLiquidity.data, decimals)} /><Breakdown label="Pending obligations" value={formatUSD(outstanding.data, decimals)} /></div></section>
+            <section className="neo-card border-l-4 border-l-[#ffe17c] p-6"><h2 className="cabinet text-sm uppercase tracking-tight text-[#b45309]">Strategy information</h2><p className="mt-2 text-sm leading-6 text-black/70">The configured MockStrategy is a test adapter that returns principal only. It does not generate yield. No APY or external protocol is represented here.</p><p className="mt-3 text-xs font-bold text-black">Available now: {formatUSD(deployable.data, decimals)}</p></section>
           </aside>
         </div>
       </>}
-    </section>
-    <SolventFooter />
-  </main>;
+    </main>
+    <WorkspaceFooter />
+  </div>;
 }
 
 function Metric({ label, value, primary = false }: { label: string; value: string; primary?: boolean }) {
-  return <div className={`rounded-3xl border p-5 shadow-sm ${primary ? "border-blue-700 bg-blue-700 text-white" : "border-slate-200 bg-white"}`}><p className={`text-xs font-semibold ${primary ? "text-blue-100" : "text-slate-500"}`}>{label}</p><p className={`mt-2 text-2xl font-extrabold tabular-nums ${primary ? "text-white" : "text-blue-700"}`}>{value}</p></div>;
+  if (primary) return <div className="border-2 border-black bg-[#ffe17c] p-5 shadow-[4px_4px_0_0_#000]"><div className="neo-label">{label}</div><div className="mt-1 cabinet text-2xl tabular-nums text-black">{value}</div></div>;
+  return <div className="neo-card p-5"><div className="neo-label">{label}</div><div className="mt-1 cabinet text-2xl tabular-nums text-black">{value}</div></div>;
 }
 
 function Breakdown({ label, value }: { label: string; value: string }) {
-  return <div className="flex items-center justify-between gap-4 text-sm"><span className="text-slate-600">{label}</span><span className="font-bold tabular-nums text-slate-900">{value}</span></div>;
+  return <div className="flex items-center justify-between gap-4 text-sm"><span className="text-black/60">{label}</span><span className="cabinet tabular-nums text-black">{value}</span></div>;
 }
