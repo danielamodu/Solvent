@@ -23,7 +23,7 @@ This release targets **Arbitrum Sepolia** and the SolventUSD (SUSD) address alre
 
    The transaction receipt succeeded (status 1), names this address as the created contract, and the address has deployed bytecode. `.env` is configured with this verified address and block. It replaces `0xE8a767b3874bbC6A1c86cD2819C7981FC74687BE` (block `314607348`), which predates the whitelist/nonce changes and cannot be upgraded. The earlier `0x4f1294169e835402541ef58bBc332AF3Dd92EDeA` (block `314093176`) predates the Aave adapter. The alternate address `0x4f1d36cd625268a08cf7dc5310cde67b3202edea` from the initial handoff is incorrect and has no deployed code.
 3. Restart the web app and indexer after configuring the environment.
-4. Set the same `SOLVENT_DATABASE_PATH` on the web process and indexer. Use a durable writable volume on a single Node host; this SQLite implementation is not a serverless or multi-replica database.
+4. Storage, two modes: default is SQLite — set the same `SOLVENT_DATABASE_PATH` on the web process and indexer, on a durable writable volume on a single Node host. For shared/multi-replica hosting, set the same `SOLVENT_DATABASE_URL` (Postgres) on both processes instead; both switch backends on that one variable with the same schema.
 5. Run `npm run indexer` as a supervised process. Run `npm run release-check` before exposing the deployment.
 6. Configure the keeper endpoint and token, then run it separately using the keeper instructions. Avoid configuring the keeper EOA against a Safe-owned vault; it will not satisfy Safe ownership checks.
 

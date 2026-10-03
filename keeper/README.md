@@ -69,6 +69,8 @@ Optional:
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `KEEPER_OWNER_ADDRESS` | signer address | Treasury owner to watch on the factory |
+| `KEEPER_HEARTBEAT_URL` | — | Where to POST per-vault status (dashboard reads it) |
+| `KEEPER_HEARTBEAT_TOKEN` | — | Bearer token for the heartbeat endpoint (≥24 chars, must match the web process) |
 | `NEXT_PUBLIC_TREASURY_FACTORY_DEPLOY_BLOCK` | `0` | First block to scan (factory creation scans fall back to `NEXT_PUBLIC_OBLIGATION_REGISTRY_DEPLOY_BLOCK`) |
 | `KEEPER_INTERVAL_MS` | `60000` | Tick interval |
 | `KEEPER_DRY_RUN` | `false` | Decide and log, but send **no** transactions |
