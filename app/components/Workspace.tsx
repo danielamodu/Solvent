@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ConnectKitButton } from "connectkit";
-import { Zap, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { SolventMark } from "./Logo";
 
 type Tab = "overview" | "obligations" | "liquidity" | "deploy" | "connect";
 
@@ -27,12 +28,12 @@ export function WorkspaceHeader({
 }) {
   return (
     <header className="sticky top-0 z-50 border-b-2 border-black bg-[#171e19]">
-      <div className="mx-auto flex min-h-[72px] w-full max-w-[1440px] flex-wrap items-center gap-x-6 gap-y-3 px-5 py-3 md:px-10">
+      <div className="mx-auto flex min-h-[72px] w-full max-w-[1720px] flex-wrap items-center gap-x-6 gap-y-3 px-5 py-3 md:px-10">
         <Link href="/" className="flex items-center gap-3" aria-label="Solvent home">
           <span className="flex h-9 w-9 items-center justify-center border-2 border-black bg-[#ffe17c]">
-            <Zap className="h-5 w-5 text-black" strokeWidth={2.5} aria-hidden="true" />
+            <SolventMark className="h-5 w-5 text-black" />
           </span>
-          <span className="cabinet text-xl uppercase tracking-tighter text-white">
+          <span className="cabinet text-xl tracking-tighter text-white">
             Solvent
           </span>
         </Link>
@@ -92,7 +93,7 @@ export function WorkspaceFooter({
 }) {
   return (
     <footer className="border-t-2 border-black bg-[#171e19]">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-x-6 gap-y-3 px-5 py-5 text-xs md:px-10">
+      <div className="mx-auto flex w-full max-w-[1720px] flex-wrap items-center gap-x-6 gap-y-3 px-5 py-5 text-xs md:px-10">
         <span className="inline-flex items-center gap-2 font-bold uppercase tracking-wider text-[#ffe17c]">
           <span className="h-2 w-2 rounded-full bg-[#ffe17c]" aria-hidden="true" />
           Arbitrum Sepolia

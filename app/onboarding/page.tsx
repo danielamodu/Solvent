@@ -19,6 +19,7 @@ import {
   Wallet,
   Zap,
 } from "lucide-react";
+import { SolventMark } from "@/app/components/Logo";
 import { CHAIN_ID, erc20Abi, susdFaucetAbi, usdcAddress } from "@/lib/contracts";
 import { formatUSD } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
@@ -40,9 +41,9 @@ export default function OnboardingPage() {
       <header className="sticky top-0 z-50 flex h-20 items-center justify-between border-b-2 border-black bg-[#ffe17c] px-6 md:px-12">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center bg-black">
-            <Zap className="h-6 w-6 text-[#ffe17c]" aria-hidden="true" />
+            <SolventMark className="h-6 w-6 text-[#ffe17c]" />
           </span>
-          <span className="cabinet text-2xl uppercase tracking-tight text-black">Solvent</span>
+          <span className="cabinet text-2xl tracking-tight text-black">Solvent</span>
         </div>
         <button
           onClick={finish}
