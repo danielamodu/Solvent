@@ -8,14 +8,15 @@ export function SolventMark({ className = "h-5 w-5" }: { className?: string }) {
       fill="none"
       stroke="currentColor"
       strokeWidth={2}
-      vectorEffect="non-scaling-stroke"
       className={className}
       role="img"
       aria-label="Solvent logo"
     >
-      <path d="M225 60 H55 V225 C55 285 115 328 178 330" />
-      <path d="M155 190 V430" />
-      <path d="M155 190 C250 190 375 235 375 310 C375 375 325 425 272 432" />
+      {/* vector-effect lives on each shape: it is not an inherited property,
+          so putting it on <svg> silently disables it and the mark vanishes. */}
+      <path d="M225 60 H55 V225 C55 285 115 328 178 330" vectorEffect="non-scaling-stroke" />
+      <path d="M155 190 V430" vectorEffect="non-scaling-stroke" />
+      <path d="M155 190 C250 190 375 235 375 310 C375 375 325 425 272 432" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }

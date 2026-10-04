@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Solvent logo">
   <rect width="64" height="64" rx="14" fill="#171e19"/>
-  <g transform="translate(9,9) scale(0.0958)" fill="none" stroke="#ffe17c" stroke-width="2" vector-effect="non-scaling-stroke">
-    <path d="M225 60 H55 V225 C55 285 115 328 178 330"/>
-    <path d="M155 190 V430"/>
-    <path d="M155 190 C250 190 375 235 375 310 C375 375 325 425 272 432"/>
+  <g transform="translate(9,9) scale(0.0958)" fill="none" stroke="#ffe17c" stroke-width="2">
+    <path d="M225 60 H55 V225 C55 285 115 328 178 330" vector-effect="non-scaling-stroke"/>
+    <path d="M155 190 V430" vector-effect="non-scaling-stroke"/>
+    <path d="M155 190 C250 190 375 235 375 310 C375 375 325 425 272 432" vector-effect="non-scaling-stroke"/>
   </g>
 </svg>
