@@ -47,7 +47,7 @@ button { cursor: pointer; }
 .workspace-shell ::selection { color: #000; background: var(--primary-yellow); }
 .workspace-shell :focus-visible { outline: 3px solid var(--primary-yellow); outline-offset: 2px; }
 
-.cabinet { font-family: "Cabinet Grotesk", "Satoshi", ui-sans-serif, sans-serif; font-weight: 800; }
+.cabinet { font-family: "Cabinet Grotesk", "Satoshi", ui-sans-serif, sans-serif; font-weight: 700; }
 
 .brutalist-border { border: 2px solid #000; }
 .brutalist-shadow-sm { box-shadow: 4px 4px 0 0 #000; }
@@ -70,7 +70,7 @@ button { cursor: pointer; }
 .dot-pattern { background-image: radial-gradient(#000 1px, transparent 1px); background-size: 32px 32px; }
 .dot-pattern-light { background-image: radial-gradient(rgba(255,255,255,.14) 1px, transparent 1px); background-size: 32px 32px; }
 
-.badge { display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid #000; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; }
+.badge { display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid #000; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
 .accent-bar { border-left: 4px solid var(--primary-yellow); }
 
 .animate-marquee { display: flex; width: max-content; animation: marquee 32s linear infinite; }
@@ -80,7 +80,7 @@ button { cursor: pointer; }
 @keyframes skeleton-neo { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* ConnectKit button restyle inside the neo workspace header */
-.workspace-wallet button { border: 2px solid #000 !important; border-radius: 12px !important; background: var(--primary-yellow) !important; color: #000 !important; font-family: "Cabinet Grotesk", sans-serif !important; font-weight: 800 !important; font-size: 12px !important; text-transform: uppercase !important; letter-spacing: .03em !important; box-shadow: 4px 4px 0 0 #000 !important; min-height: 44px !important; transition: transform .2s, box-shadow .2s !important; }
+.workspace-wallet button { border: 2px solid #000 !important; border-radius: 12px !important; background: var(--primary-yellow) !important; color: #000 !important; font-family: "Cabinet Grotesk", sans-serif !important; font-weight: 700 !important; font-size: 12px !important; text-transform: uppercase !important; letter-spacing: .03em !important; box-shadow: 4px 4px 0 0 #000 !important; min-height: 44px !important; transition: transform .2s, box-shadow .2s !important; }
 .workspace-wallet button:hover { transform: translate(4px, 4px) !important; box-shadow: 0 0 0 0 #000 !important; }
 
 /* Reusable neo-brutalist primitives (in @layer so Tailwind utilities can still
@@ -97,7 +97,7 @@ button { cursor: pointer; }
   .neo-input:focus { outline: none; background: #fff8e1; }
   .neo-input:disabled { opacity: .5; cursor: not-allowed; }
 
-  .neo-btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .6rem 1rem; border: 2px solid #000; border-radius: 10px; font-family: "Cabinet Grotesk", sans-serif; font-weight: 800; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; transition: transform .18s cubic-bezier(.175,.885,.32,1.275), box-shadow .18s, background-color .18s; }
+  .neo-btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .6rem 1rem; border: 2px solid #000; border-radius: 10px; font-family: "Cabinet Grotesk", sans-serif; font-weight: 700; font-size: .78rem; letter-spacing: .02em; text-transform: uppercase; cursor: pointer; transition: transform .18s cubic-bezier(.175,.885,.32,1.275), box-shadow .18s, background-color .18s; }
   .neo-btn:disabled { opacity: .4; cursor: not-allowed; }
   .neo-btn-primary { background: #000; color: #fff; box-shadow: 4px 4px 0 0 rgba(0,0,0,.3); }
   .neo-btn-primary:not(:disabled):hover { transform: translate(3px,3px); box-shadow: 1px 1px 0 0 rgba(0,0,0,.3); }
