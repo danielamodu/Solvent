@@ -15,6 +15,8 @@ const REVERT_MESSAGES: Record<string, string> = {
   "TreasuryVault: insufficient balance":
     "Not enough idle balance — recall from the strategy first.",
   "TreasuryVault: not authorized": "Only the vault owner can do that.",
+  "TreasuryVault: strategy not authorized":
+    "This strategy isn't approved for the vault — connect the treasury's own strategy or ask the owner to authorize it.",
   "ObligationRegistry: not pending": "This obligation is no longer pending.",
   "ObligationRegistry: beneficiary is zero address":
     "Enter a valid beneficiary address.",

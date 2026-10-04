@@ -306,6 +306,7 @@ function FundStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }
         )}
       </div>
       <StepNav onBack={onBack} onNext={onNext} nextLabel={hasClaimed ? "Continue" : "Skip for now"} />
+      <p className="mx-auto mt-4 max-w-xl text-center text-xs text-[#b7c6c2]/70">Need more than {FAUCET_AMOUNT.toLocaleString()}? The dashboard faucet mints any custom amount (same 6-hour cooldown).</p>
     </div>
   );
 }
