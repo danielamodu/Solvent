@@ -76,8 +76,8 @@ export default function LandingPage() {
     </header>
 
     <main className="flex-1">
-      <section className="dot-pattern relative overflow-hidden bg-[#ffe17c] px-5 pb-24 pt-36 md:px-10">
-        <div className="mx-auto grid max-w-[1720px] items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
+      <section className="dot-pattern relative flex min-h-[calc(100svh-5rem)] flex-col justify-center overflow-hidden bg-[#ffe17c] px-5 pb-16 pt-28 md:px-10">
+        <div className="mx-auto grid w-full max-w-none items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
           <div>
             <span className="badge inline-flex items-center gap-2 border-2 border-black bg-black text-[#ffe17c]"><span className="h-2 w-2 rounded-full bg-[#ffe17c]" />New · Obligation-aware treasury control</span>
             <h1 className="cabinet mt-6 text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl md:text-7xl xl:text-8xl">Know what you owe.<br /><span className="text-transparent [-webkit-text-stroke:2px_#000]">Move what is free.</span></h1>
