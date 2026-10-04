@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, ChevronDown, Droplets, Eye, LayoutDashboard, ListTodo, PenTool, Rocket, Shield, ShieldCheck, TrendingUp, Zap, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ClipboardList, Droplets, Eye, Landmark, LayoutDashboard, ListTodo, PenTool, Rocket, Shield, ShieldCheck, TrendingUp, Zap, type LucideIcon } from "lucide-react";
 import { SolventMark } from "./components/Logo";
 
 // Brand icons lucide no longer ships (Github/Twitter were removed), so the
@@ -103,7 +103,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1720px]">
           <div className="neo-label text-[#b7c6c2]">Why Solvent</div>
           <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Treasury management that starts with liabilities</h2>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="mt-14 grid gap-8 md:grid-cols-3">
             {whyCards.map(({ icon: Icon, title, body }) => <div key={title} className="accent-bar border-2 border-black bg-white p-7 text-black shadow-[8px_8px_0_0_#000]">
               <span className="grid h-12 w-12 place-items-center border-2 border-black bg-[#ffe17c]"><Icon size={22} /></span>
               <h3 className="cabinet mt-5 text-xl tracking-tight">{title}</h3>
@@ -113,11 +113,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="product" className="bg-white px-5 py-24 md:px-10">
+      <section id="product" className="bg-white px-5 py-28 md:px-10">
         <div className="mx-auto max-w-[1720px]">
           <div className="neo-label">The product</div>
           <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Record the promise. Protect it. Deploy the rest.</h2>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="mt-14 grid gap-8 md:grid-cols-3">
             {productCards.map(({ icon: Icon, title, body, bg }) => <div key={title} className={`border-2 border-black p-7 shadow-[8px_8px_0_0_#000] ${bg}`}>
               <span className="grid h-12 w-12 place-items-center border-2 border-black bg-black text-[#ffe17c]"><Icon size={22} /></span>
               <h3 className="cabinet mt-5 text-xl tracking-tight">{title}</h3>
@@ -126,11 +126,11 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section id="how" className="dot-pattern bg-[#ffe17c] px-5 py-24 md:px-10">
+      <section id="how" className="dot-pattern bg-[#ffe17c] px-5 py-28 md:px-10">
         <div className="mx-auto max-w-[1720px]">
           <div className="neo-label">How it works</div>
           <h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Four steps to total clarity</h2>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map(({ n, title, body, dark }) => <div key={n} className={`border-2 border-black p-6 shadow-[8px_8px_0_0_#000] ${dark ? "bg-[#171e19] text-white" : "bg-white text-black"}`}>
               <span className={`cabinet grid h-12 w-12 place-items-center border-2 text-xl ${dark ? "border-white bg-[#ffe17c] text-black" : "border-black bg-black text-[#ffe17c]"}`}>{n}</span>
               <h3 className="cabinet mt-5 text-lg tracking-tight">{title}</h3>
@@ -144,20 +144,20 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1720px]">
           <div className="neo-label text-[#b7c6c2]">Capital legibility</div>
           <h2 className="cabinet mt-2 max-w-3xl text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Every dollar has a job</h2>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Primitive label="Reserve" sub="Operational floor" bg="bg-[#b7c6c2]" />
-            <Primitive label="Obligations" sub="Promised out" bg="bg-[#ffe17c]" />
-            <Primitive label="Deployed" sub="At work" bg="bg-white" />
-            <Primitive label="Deployable" sub="Safe to move" bg="bg-[#ffe17c]" primary />
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <Primitive label="Reserve" sub="Operational floor" bg="bg-[#b7c6c2]" Icon={Landmark} />
+            <Primitive label="Obligations" sub="Promised out" bg="bg-[#ffe17c]" Icon={ClipboardList} />
+            <Primitive label="Deployed" sub="At work" bg="bg-white" Icon={TrendingUp} />
+            <Primitive label="Deployable" sub="Safe to move" bg="bg-[#ffe17c]" primary Icon={ArrowUpRight} />
           </div>
           <p className="mt-10 max-w-2xl text-sm leading-6 text-[#b7c6c2]">Deployable = Total assets − Reserve − Pending obligations − Already deployed. The invariant is enforced on-chain, every block.</p>
         </div>
       </section>
-      <section id="app" className="bg-white px-5 py-24 md:px-10">
+      <section id="app" className="bg-white px-5 py-28 md:px-10">
         <div className="mx-auto max-w-[1720px]">
           <div className="neo-label">The workspace</div>
           <h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Four views, one source of truth</h2>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {views.map(({ icon: Icon, title, body, href, bg }) => <Link key={title} href={href} className={`group border-2 border-black p-6 shadow-[8px_8px_0_0_#000] transition-transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0_0_#000] ${bg}`}>
               <span className="grid h-12 w-12 place-items-center border-2 border-black bg-black text-[#ffe17c]"><Icon size={22} /></span>
               <h3 className="cabinet mt-5 flex items-center gap-1 text-lg tracking-tight">{title} <ArrowUpRight size={16} className="opacity-0 transition-opacity group-hover:opacity-100" /></h3>
@@ -167,7 +167,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-[#b7c6c2] px-5 py-24 md:px-10">
+      <section className="bg-[#b7c6c2] px-5 py-28 md:px-10">
         <div className="mx-auto grid max-w-[1720px] gap-12 lg:grid-cols-[.8fr_1.2fr]">
           <div><div className="neo-label">FAQ</div><h2 className="cabinet mt-2 text-4xl uppercase tracking-tight sm:text-5xl lg:text-6xl">Questions, answered</h2><p className="mt-4 text-sm leading-6 text-black/70">Everything you need to know about obligation-aware treasury management on Solvent.</p></div>
           <div className="space-y-4">
@@ -178,7 +178,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="dot-pattern bg-[#ffe17c] px-5 py-28 text-center md:px-10">
+      <section className="dot-pattern bg-[#ffe17c] px-5 py-36 text-center md:px-10">
         <div className="mx-auto max-w-[820px]">
           <h2 className="cabinet text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">Deploy with total clarity.</h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-7 text-black/70">Connect your treasury, record what you owe, and move only the capital that is truly free.</p>
@@ -187,7 +187,7 @@ export default function LandingPage() {
       </section>
     </main>
 
-    <footer className="bg-[#171e19] px-5 py-16 text-white md:px-10">
+    <footer className="bg-[#171e19] px-5 py-20 text-white md:px-10">
       <div className="mx-auto grid max-w-[1720px] gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2"><span className="grid h-9 w-9 place-items-center border-2 border-white bg-[#ffe17c] text-black"><SolventMark className="h-5 w-5" /></span><span className="cabinet text-xl tracking-tight">Solvent</span></div>
@@ -227,11 +227,11 @@ function Marquee() {
   </div>;
 }
 
-function Primitive({ label, sub, bg, primary = false }: { label: string; sub: string; bg: string; primary?: boolean }) {
+function Primitive({ label, sub, bg, primary = false, Icon }: { label: string; sub: string; bg: string; primary?: boolean; Icon: LucideIcon }) {
   return <div className={`border-2 border-black p-6 text-black shadow-[8px_8px_0_0_#000] ${bg}`}>
-    <div className={`grid h-20 place-items-center border-2 border-black ${primary ? "bg-black text-[#ffe17c]" : "bg-white/60"}`}><span className="cabinet text-2xl uppercase tracking-tight">{primary ? "✓" : label[0]}</span></div>
+    <div className={`grid h-20 place-items-center border-2 border-black ${primary ? "bg-black text-[#ffe17c]" : "bg-white/60"}`}><Icon size={30} aria-hidden="true" /></div>
     <h3 className="cabinet mt-4 text-lg tracking-tight">{label}</h3>
-      <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-black/50">{sub}</p>
+    <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-black/50">{sub}</p>
   </div>;
 }
 
