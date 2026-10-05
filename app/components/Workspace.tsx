@@ -1,9 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { ConnectKitButton } from "connectkit";
+import { useAccount } from "wagmi";
+import { useModal } from "connectkit";
 import { ArrowLeft } from "lucide-react";
 import { SolventMark } from "./Logo";
+import { shortenAddress } from "@/lib/format";
+
+/**
+ * On-brand wallet button replacing ConnectKit's default pill (all-caps
+ * address, generic avatar, off-theme underline). Disconnected: yellow
+ * connect CTA. Connected: black pill with live dot + checksummed address;
+ * clicking opens the account modal (profile, switch, disconnect).
+ */
+export function WalletButton() {
+  const { address, isConnected } = useAccount();
+  const { setOpen } = useModal();
+  if (!isConnected || !address) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="neo-btn neo-btn-accent">
+        Connect wallet
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      title="Manage wallet connection"
+      className="cabinet flex items-center gap-2 border-2 border-black bg-black px-3 py-2 text-xs tracking-wide text-white transition-colors hover:text-[#ffe17c]"
+    >
+      <span className="h-2 w-2 rounded-full bg-[#10b981]" aria-hidden="true" />
+      {shortenAddress(address)}
+    </button>
+  );
+}
 
 type Tab = "overview" | "obligations" | "liquidity" | "deploy" | "connect";
 
@@ -70,7 +101,7 @@ export function WorkspaceHeader({
             Back
           </Link>
           <div className="workspace-wallet">
-            <ConnectKitButton />
+            <WalletButton />
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { parseUnits } from "viem";
 import { useAccount, useReadContract, useSwitchChain } from "wagmi";
-import { ConnectKitButton } from "connectkit";
+import { WalletButton } from "@/app/components/Workspace";
 import {
   ArrowRight,
   BarChart3,
@@ -295,7 +295,7 @@ function FundStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }
         {!usdcAddress ? (
           <p className="border-2 border-l-4 border-black border-l-[#ffe17c] bg-black/5 p-3 text-xs text-black/70">The SUSD token isn&apos;t configured. Set NEXT_PUBLIC_USDC_ADDRESS and restart to enable the faucet.</p>
         ) : !isConnected ? (
-          <div className="space-y-3"><p className="text-sm text-black/60">Connect a wallet to claim your test SUSD.</p><ConnectKitButton /></div>
+          <div className="space-y-3"><p className="text-sm text-black/60">Connect a wallet to claim your test SUSD.</p><WalletButton /></div>
         ) : !correctNetwork ? (
           <div className="flex items-center justify-between gap-3 border-2 border-l-4 border-black border-l-[#ffe17c] bg-black/5 p-3"><span className="text-xs font-semibold text-black/70">Switch to Arbitrum Sepolia to claim.</span><button onClick={() => switchChain({ chainId: CHAIN_ID })} className="neo-btn neo-btn-primary shrink-0">Switch</button></div>
         ) : (

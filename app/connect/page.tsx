@@ -4,12 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAddress, zeroAddress } from "viem";
 import { useAccount, useReadContract, useSwitchChain } from "wagmi";
-import { ConnectKitButton } from "connectkit";
 import { Check, Wallet } from "lucide-react";
 import { CHAIN_ID, treasuryVaultAbi } from "@/lib/contracts";
 import { useTreasury } from "@/lib/treasury-context";
 import { shortenAddress } from "@/lib/format";
-import { WorkspaceFooter, WorkspaceHeader } from "@/app/components/Workspace";
+import { WorkspaceFooter, WorkspaceHeader, WalletButton } from "@/app/components/Workspace";
 import { TreasurySetup } from "@/app/components/TreasurySetup";
 
 export default function ConnectPage() {
@@ -36,7 +35,7 @@ export default function ConnectPage() {
               <span className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-black bg-[#b7c6c2]"><Wallet className="h-5 w-5 text-black" aria-hidden="true" /></span>
               <div><h2 className="cabinet text-sm uppercase tracking-tight">Select wallet</h2><p className="mt-0.5 text-xs font-semibold text-black/50">Use an injected wallet or open Solvent inside the Safe app.</p></div>
             </div>
-            <ConnectKitButton />
+            <WalletButton />
             {!isConnected && <p className="mt-3 text-xs text-black/50">Use a browser wallet to connect — or open Solvent inside the Safe app to connect as your Safe.</p>}
           </div>
           {isConnected && !correctNetwork && <div className="mt-4 flex items-center justify-between gap-3 border-2 border-l-4 border-black border-l-[#ffe17c] bg-white p-4 text-black"><span className="text-sm font-semibold">Switch to Arbitrum Sepolia to verify this treasury.</span><button onClick={() => switchChain({ chainId: CHAIN_ID })} className="neo-btn neo-btn-primary shrink-0">Switch network</button></div>}
