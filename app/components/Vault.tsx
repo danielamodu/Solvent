@@ -2,33 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { formatUnits } from "viem";
-import { useAccount, usePublicClient, useReadContract, useSwitchChain } from "wagmi";
+import { useAccount, useReadContract, useSwitchChain } from "wagmi";
 import {
   CHAIN_ID,
   erc20Abi,
   MOCK_STRATEGY_ABI,
   OBLIGATION_REGISTRY_ABI,
-  treasuryFactoryAbi,
-  treasuryFactoryAddress,
   treasuryVaultAbi,
-  AAVE_SEPOLIA_USDC,
 } from "@/lib/contracts";
 import { formatUSD, shortenAddress } from "@/lib/format";
 import { useObligations } from "@/lib/useObligations";
 import { useTreasury } from "@/lib/treasury-context";
-import { DepositCard } from "./DepositCard";
-import { FaucetCard } from "./FaucetCard";
+import Link from "next/link";
 import { LiquidityTimeline } from "./LiquidityTimeline";
-import { ObligationCard } from "./ObligationCard";
 import { ShortfallAlert } from "./ShortfallAlert";
-import { StrategyCard } from "./StrategyCard";
 import { TreasurySetup } from "./TreasurySetup";
 import { Skeleton } from "./ui";
-import { WithdrawCard } from "./WithdrawCard";
 
 export function Vault() {
   const { address, isConnected, chainId } = useAccount();
-  const publicClient = usePublicClient({ chainId: CHAIN_ID });
   const { switchChain } = useSwitchChain();
   const { treasury, setTreasury, hydrated } = useTreasury();
   const [showSetup, setShowSetup] = useState(false);
@@ -84,13 +76,6 @@ export function Vault() {
     chainId: CHAIN_ID,
     query: { enabled: configured },
   });
-  const symbolRead = useReadContract({
-    address: treasury?.asset,
-    abi: erc20Abi,
-    functionName: "symbol",
-    chainId: CHAIN_ID,
-    query: { enabled: configured },
-  });
   const outstanding = useReadContract({
     address: treasury?.registry,
     abi: OBLIGATION_REGISTRY_ABI,
@@ -114,18 +99,12 @@ export function Vault() {
   });
 
   const decimals = decimalsRead.data ?? 6;
-  const symbol = symbolRead.data ?? "SUSD";
-  // The faucet mints via the token's open `mint`. Canonical Aave USDC has no
-  // such mint, so only offer it for SUSD / mock assets.
-  const mintableAsset =
-    Boolean(treasury?.asset) &&
-    treasury!.asset.toLowerCase() !== AAVE_SEPOLIA_USDC.toLowerCase();
   const isOwner =
     Boolean(address) &&
     typeof ownerRead.data === "string" &&
     address!.toLowerCase() === ownerRead.data.toLowerCase();
 
-  const { obligations, refetch: refetchObligations, loadError: obligationsError } = useObligations();
+  const { obligations, loadError: obligationsError } = useObligations();
 
   // First-run guidance: an empty treasury shows a 3-step checklist instead of
   // the full board. It disappears after the first deposit.
@@ -167,11 +146,6 @@ export function Vault() {
   // connected on the right chain.
   const wrongNetwork = isConnected && chainId !== CHAIN_ID;
   const canInteract = isConnected && !wrongNetwork;
-  const interactionHint = !isConnected
-    ? "Connect your wallet"
-    : wrongNetwork
-      ? "Switch to Arbitrum Sepolia"
-      : undefined;
 
   // Surface read failures (RPC down/timeout) instead of a blank or stale board.
   const readError =
@@ -276,62 +250,23 @@ export function Vault() {
           loading={available.isLoading}
         />
       </div>
-      <section className="neo-card-dark px-4 py-3 text-xs text-white/60">
-        <h2 className="cabinet text-xs uppercase tracking-tight text-white">How liquidity is protected</h2>
-        <p className="mt-1">Protected liquidity is the reserve plus all pending obligations. Deployable capital is what remains after protected funds and existing deployments. Payment readiness assumes the displayed strategy liquidity can be withdrawn now.</p>
-        {typeof ownerRead.data === "string" && <p className="mt-2">Controls: owner only ({shortenAddress(ownerRead.data)}). If this owner is a Safe, its configured threshold governs approvals. EOA-owned treasuries require an explicit ownership transfer to use a Safe.</p>}
+      <section className="grid gap-4 sm:grid-cols-3">
+        <Link href="/deploy" className="neo-card group p-5 transition-transform hover:translate-x-1 hover:translate-y-1">
+          <div className="neo-label">Move capital</div>
+          <div className="cabinet mt-1 text-lg tracking-tight text-black">Fund &amp; deploy →</div>
+          <p className="mt-1 text-xs text-black/60">Faucet, deposit, withdraw, strategy positions.</p>
+        </Link>
+        <Link href="/obligations" className="neo-card group p-5 transition-transform hover:translate-x-1 hover:translate-y-1">
+          <div className="neo-label">Promises</div>
+          <div className="cabinet mt-1 text-lg tracking-tight text-black">Manage obligations →</div>
+          <p className="mt-1 text-xs text-black/60">Record, settle, and cancel commitments.</p>
+        </Link>
+        <Link href="/liquidity" className="neo-card group p-5 transition-transform hover:translate-x-1 hover:translate-y-1">
+          <div className="neo-label">Coverage</div>
+          <div className="cabinet mt-1 text-lg tracking-tight text-black">Review liquidity →</div>
+          <p className="mt-1 text-xs text-black/60">Coverage timeline and shortfall monitors.</p>
+        </Link>
       </section>
-      <DataFreshness updatedAt={totalAssets.dataUpdatedAt} />
-
-      {treasury?.registry && (
-        <ObligationCard
-          decimals={decimals}
-          symbol={symbol}
-          availableBalance={available.data}
-          isOwner={isOwner}
-          obligations={obligations}
-          refetch={refetchObligations}
-          onChange={refresh}
-          disabled={!canInteract}
-          disabledReason={interactionHint}
-        />
-      )}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {mintableAsset && (
-          <FaucetCard
-            decimals={decimals}
-            onChange={refresh}
-            disabled={!canInteract}
-            disabledReason={interactionHint}
-          />
-        )}
-        <DepositCard
-          decimals={decimals}
-          symbol={symbol}
-          onChange={refresh}
-          disabled={!canInteract}
-          disabledReason={interactionHint}
-        />
-        <WithdrawCard
-          decimals={decimals}
-          symbol={symbol}
-          isOwner={isOwner}
-          onChange={refresh}
-          disabled={!canInteract}
-          disabledReason={interactionHint}
-        />
-        {treasury?.strategy && (
-          <StrategyCard
-            decimals={decimals}
-            isOwner={isOwner}
-            onChange={refresh}
-            deployableCapital={deployable.data}
-            disabled={!canInteract}
-            disabledReason={interactionHint}
-          />
-        )}
-      </div>
-      <KeeperStatus vault={treasury!.vault} />
       <ReadinessAlerts
         vault={treasury!.vault}
         obligations={obligations}
@@ -341,7 +276,6 @@ export function Vault() {
         strategyPosition={deployed.data}
         decimals={decimals}
       />
-      <TreasuryActivity vault={treasury!.vault} />
       <ShortfallAlert
         protectedLiquidity={protectedLiquidity.data}
         availableBalance={available.data}
@@ -351,6 +285,8 @@ export function Vault() {
         isOwner={isOwner && canInteract}
         onChange={refresh}
       />
+      <KeeperStatus vault={treasury!.vault} />
+      <TreasuryActivity vault={treasury!.vault} />
     </section>
   );
 }
@@ -359,9 +295,9 @@ export function Vault() {
 // promise. Vanishes after the first deposit so the full board takes over.
 function GettingStarted() {
   const steps = [
-    { n: "1", title: "Claim free test SUSD", body: "Faucet card below — testnet funds, no real value." },
-    { n: "2", title: "Deposit it", body: "Move SUSD into the vault. Totals update on confirmation." },
-    { n: "3", title: "Record an obligation", body: "Watch protected liquidity rise and deployable fall." },
+    { n: "1", title: "Claim free test SUSD", body: "Fund the vault on the Deploy page — testnet funds, no real value.", href: "/deploy" },
+    { n: "2", title: "Deposit it", body: "Move SUSD into the vault. Totals update on confirmation.", href: "/deploy" },
+    { n: "3", title: "Record an obligation", body: "Watch protected liquidity rise and deployable fall.", href: "/obligations" },
   ];
   return (
     <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
@@ -370,7 +306,7 @@ function GettingStarted() {
         {steps.map((s) => (
           <li key={s.n} className="flex items-start gap-3 text-xs">
             <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white text-[10px] font-bold text-neutral-900">{s.n}</span>
-            <span><span className="font-medium text-neutral-200">{s.title}.</span> <span className="text-neutral-500">{s.body}</span></span>
+            <span><Link href={s.href} className="font-medium text-neutral-200 underline underline-offset-2">{s.title}</Link> <span className="text-neutral-500">{s.body}</span></span>
           </li>
         ))}
       </ol>
@@ -429,17 +365,6 @@ function KeeperStatus({ vault }: { vault: `0x${string}` }) {
     {fresh && status?.lastAction && <span>· {status.lastAction}</span>}
     {fresh && status?.lastError && <span className="text-[#ffe17c]">· {status.lastError}</span>}
   </div>;
-}
-
-function DataFreshness({ updatedAt }: { updatedAt: number }) {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 15_000);
-    return () => window.clearInterval(id);
-  }, []);
-  if (!updatedAt) return <p className="px-1 text-xs text-white/45">Waiting for the first onchain read…</p>;
-  const seconds = Math.max(0, Math.floor((now - updatedAt) / 1000));
-  return <p className="px-1 text-xs text-white/45">Vault data updated {seconds < 5 ? "just now" : `${seconds}s ago`} · refreshes after confirmed actions.</p>;
 }
 
 function ReadinessAlerts({ vault, obligations, protectedLiquidity, availableBalance, strategyLiquidity, strategyPosition, decimals }: {
