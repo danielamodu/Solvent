@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
+import { useModal } from "connectkit";
 import { ArrowUpRight, ChevronDown, ClipboardList, Droplets, Eye, Landmark, LayoutDashboard, ListTodo, PenTool, Rocket, Shield, ShieldCheck, TrendingUp, Zap, type LucideIcon } from "lucide-react";
 import { SolventMark } from "./components/Logo";
+import { useIsFirstTimer } from "@/lib/onboarded";
 
 // Brand icons lucide no longer ships (Github/Twitter were removed), so the
 // footer socials are inline SVGs. Globe below mirrors lucide's globe.
@@ -59,6 +63,35 @@ const faqs = [
   { q: "Does the strategy generate yield?", a: "The configured MockStrategy is a principal-only test adapter — it does not generate yield and represents no external protocol or APY." },
 ];
 
+/**
+ * Landing "Connect wallet" — opens the real wallet dialog instead of just
+ * linking onward. First-timers land in onboarding (once); everyone else goes
+ * straight to the dashboard.
+ */
+function ConnectWalletButton({ className = "", children }: { className?: string; children: ReactNode }) {
+  const router = useRouter();
+  const { isConnected } = useAccount();
+  const first = useIsFirstTimer();
+  const target = first === false ? "/dashboard" : "/onboarding";
+  const { setOpen } = useModal({
+    onConnect: () => {
+      router.push(target);
+    },
+  });
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (isConnected) router.push(target);
+        else setOpen(true);
+      }}
+      className={`neo-btn neo-btn-primary ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -72,7 +105,7 @@ export default function LandingPage() {
     <header className={`fixed z-50 flex items-center justify-between border-black bg-[#ffe17c] transition-all duration-300 ${scrolled ? "left-1/2 top-5 h-16 w-[92%] max-w-[1100px] -translate-x-1/2 rounded-2xl border-2 px-5 shadow-[4px_4px_0_0_#000] backdrop-blur" : "left-0 right-0 top-0 h-20 border-b-2 px-5 md:px-10"}`}>
       <Link href="/" className="flex items-center gap-2"><span className="grid h-9 w-9 place-items-center border-2 border-black bg-black text-[#ffe17c]"><SolventMark className="h-5 w-5" /></span><span className="cabinet text-xl tracking-tight">Solvent</span></Link>
       <nav className="hidden items-center gap-8 text-sm font-semibold uppercase tracking-wide md:flex"><a href="#product" className="hover:opacity-60">Product</a><a href="#how" className="hover:opacity-60">How it works</a><a href="#app" className="hover:opacity-60">App</a></nav>
-      <Link href="/onboarding" className="neo-btn neo-btn-primary">Connect wallet</Link>
+      <ConnectWalletButton>Connect wallet</ConnectWalletButton>
     </header>
 
     <main className="flex-1">
@@ -83,7 +116,7 @@ export default function LandingPage() {
             <h1 className="cabinet mt-6 text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl md:text-7xl xl:text-8xl">Know what you owe.<br /><span className="text-transparent [-webkit-text-stroke:2px_#000]">Move what is free.</span></h1>
             <p className="mt-6 max-w-xl text-lg leading-7 text-black/70 lg:text-xl lg:leading-8">Solvent tracks every treasury commitment on-chain, protects the liquidity you need, and tells you the exact capital you can safely deploy.</p>
             <div className="mt-9 flex flex-wrap gap-4">
-              <Link href="/onboarding" className="neo-btn neo-btn-primary px-7 py-4 text-base">Connect wallet <ArrowUpRight size={18} /></Link>
+              <ConnectWalletButton className="px-7 py-4 text-base">Connect wallet <ArrowUpRight size={18} /></ConnectWalletButton>
               <Link href="/dashboard" className="neo-btn neo-btn-secondary px-7 py-4 text-base">View dashboard</Link>
             </div>
           </div>
@@ -182,7 +215,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[820px]">
           <h2 className="cabinet text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">Deploy with total clarity.</h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-7 text-black/70">Connect your treasury, record what you owe, and move only the capital that is truly free.</p>
-          <Link href="/onboarding" className="neo-btn neo-btn-primary mt-9 inline-flex px-8 py-4 text-base">Launch application <ArrowUpRight size={18} /></Link>
+          <ConnectWalletButton className="mt-9 inline-flex px-8 py-4 text-base">Launch application <ArrowUpRight size={18} /></ConnectWalletButton>
         </div>
       </section>
     </main>
