@@ -20,6 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { SolventMark } from "@/app/components/Logo";
+import { markOnboarded } from "@/lib/onboarded";
 import { CHAIN_ID, erc20Abi, susdFaucetAbi, usdcAddress } from "@/lib/contracts";
 import { formatUSD } from "@/lib/format";
 import { useTx } from "@/lib/useTx";
@@ -34,7 +35,10 @@ export default function OnboardingPage() {
   const total = STEPS.length;
   const next = () => setStep((s) => Math.min(s + 1, total - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
-  const finish = () => router.push("/dashboard");
+  const finish = () => {
+    markOnboarded();
+    router.push("/dashboard");
+  };
 
   return (
     <div className="workspace-shell flex min-h-screen flex-col">
