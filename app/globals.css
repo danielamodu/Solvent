@@ -79,9 +79,8 @@ button { cursor: pointer; }
 .skeleton-neo { background: linear-gradient(90deg, #2a322d 25%, #3a443d 50%, #2a322d 75%); background-size: 200% 100%; animation: skeleton-neo 1.4s ease infinite; }
 @keyframes skeleton-neo { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-/* ConnectKit button restyle inside the neo workspace header */
-.workspace-wallet button { border: 2px solid #000 !important; border-radius: 12px !important; background: var(--primary-yellow) !important; color: #000 !important; font-family: "Cabinet Grotesk", sans-serif !important; font-weight: 700 !important; font-size: 12px !important; text-transform: uppercase !important; letter-spacing: .03em !important; box-shadow: 4px 4px 0 0 #000 !important; min-height: 44px !important; transition: transform .2s, box-shadow .2s !important; }
-.workspace-wallet button:hover { transform: translate(4px, 4px) !important; box-shadow: 0 0 0 0 #000 !important; }
+/* (Removed: legacy ConnectKit button override. The app now uses its own
+   WalletButton, so no global !important restyle may touch header buttons.) */
 
 /* Reusable neo-brutalist primitives (in @layer so Tailwind utilities can still
    override per-element layout like w-full / grid). */

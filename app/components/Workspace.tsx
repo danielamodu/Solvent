@@ -100,9 +100,7 @@ export function WorkspaceHeader({
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
             Back
           </Link>
-          <div className="workspace-wallet">
-            <WalletButton />
-          </div>
+          <WalletButton />
         </div>
       </div>
     </header>
