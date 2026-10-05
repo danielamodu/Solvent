@@ -2,12 +2,6 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Address } from "viem";
-import {
-  mockStrategyAddress,
-  obligationRegistryAddress,
-  treasuryVaultAddress,
-  usdcAddress,
-} from "./contracts";
 
 export type TreasuryConfig = {
   vault: Address;
@@ -17,14 +11,15 @@ export type TreasuryConfig = {
 };
 
 const STORAGE_KEY = "solvent.active-treasury.v1";
-const envDefault: TreasuryConfig | null = treasuryVaultAddress && obligationRegistryAddress && usdcAddress
-  ? {
-      vault: treasuryVaultAddress,
-      registry: obligationRegistryAddress,
-      asset: usdcAddress,
-      ...(mockStrategyAddress ? { strategy: mockStrategyAddress } : {}),
-    }
-  : null;
+
+/**
+ * No env default on purpose: a fresh visitor (no saved selection) lands on
+ * treasury setup to create their OWN treasury instead of inheriting the
+ * legacy seeded vault. Judges and sharable demos go through `/demo`, which
+ * selects the stage treasury explicitly. Returning visitors hydrate from
+ * localStorage below.
+ */
+const envDefault: TreasuryConfig | null = null;
 
 const TreasuryContext = createContext<{
   treasury: TreasuryConfig | null;
