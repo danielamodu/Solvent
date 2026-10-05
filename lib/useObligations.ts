@@ -29,10 +29,12 @@ export function useObligations() {
   const { treasury } = useTreasury();
   const [obligations, setObligations] = useState<ObligationRecord[]>([]);
   const [isLoading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   const refetch = useCallback(async () => {
     if (!publicClient || !treasury?.registry) return;
     setLoading(true);
+    setLoadError(false);
     try {
       // Scan floor is the minimum of the configured blocks: the legacy
       // registry predates the current factory, so either value alone would
@@ -79,7 +81,9 @@ export function useObligations() {
 
       setObligations(records);
     } catch {
-      // Leave the previous list in place if the RPC scan fails.
+      // Never present an empty list as truth: flag the failure so callers
+      // can say "couldn't load" instead of "owes nothing".
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -91,5 +95,5 @@ export function useObligations() {
 
   const activeCount = obligations.filter((o) => o.status === 0).length;
 
-  return { obligations, activeCount, isLoading, refetch };
+  return { obligations, activeCount, isLoading, loadError, refetch };
 }

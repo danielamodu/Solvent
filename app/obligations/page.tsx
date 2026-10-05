@@ -12,7 +12,7 @@ import { WorkspaceFooter, WorkspaceHeader } from "@/app/components/Workspace";
 export default function ObligationsPage() {
   const { address, isConnected, chainId } = useAccount();
   const { treasury } = useTreasury();
-  const { obligations, activeCount, refetch } = useObligations();
+  const { obligations, activeCount, refetch, loadError } = useObligations();
   const configured = Boolean(treasury?.vault && treasury?.registry);
   const owner = useReadContract({ address: treasury?.vault, abi: treasuryVaultAbi, functionName: "owner", chainId: CHAIN_ID, query: { enabled: configured } });
   const available = useReadContract({ address: treasury?.vault, abi: treasuryVaultAbi, functionName: "availableBalance", chainId: CHAIN_ID, query: { enabled: configured } });
@@ -33,6 +33,7 @@ export default function ObligationsPage() {
         {configured && <a href="#create-obligation" className="neo-btn neo-btn-accent shrink-0">Create obligation +</a>}
       </div>
       {!configured ? <EmptyTreasury /> : <>
+        {loadError && <p className="mt-4 rounded-lg border border-amber-700/40 bg-amber-950/20 p-3 text-xs text-amber-100">Couldn&apos;t load obligations from the network — figures below may be stale. Check the RPC and refresh.</p>}
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           <Summary label="Pending obligations" value={String(activeCount)} note={`${totalCount} total records`} />
           <Summary label="Protected amount" value={formatUSD(outstanding.data, unit)} note="Reserve plus commitments" />

@@ -125,7 +125,15 @@ export function Vault() {
     typeof ownerRead.data === "string" &&
     address!.toLowerCase() === ownerRead.data.toLowerCase();
 
-  const { obligations, refetch: refetchObligations } = useObligations();
+  const { obligations, refetch: refetchObligations, loadError: obligationsError } = useObligations();
+
+  // First-run guidance: an empty treasury shows a 3-step checklist instead of
+  // the full board. It disappears after the first deposit.
+  const isFresh =
+    configured &&
+    !totalAssets.isLoading &&
+    !totalAssets.isError &&
+    totalAssets.data === 0n;
 
   // Payment coverage counts idle funds and presently withdrawable strategy liquidity.
   // Null when nothing is owed yet (all capital is deployable) or before the
@@ -179,12 +187,19 @@ export function Vault() {
   return (
     <section className="flex flex-col gap-4">
       {readError && (
-        <div className="border-2 border-l-4 border-black border-l-[#ef4444] bg-white p-4 text-black">
-          <div className="cabinet text-sm uppercase tracking-tight text-[#ef4444]">
+        <div className="rounded-xl border border-red-600/40 bg-red-950/30 p-4">
+          <div className="text-sm font-semibold text-red-300">
             Unable to fetch data
           </div>
-          <p className="mt-1 text-xs text-black/70">
+          <p className="mt-1 text-xs text-red-200/80">
             Retrying… confirm your connection to Arbitrum Sepolia.
+          </p>
+        </div>
+      )}
+      {obligationsError && (
+        <div className="rounded-xl border border-amber-700/40 bg-amber-950/20 p-4">
+          <p className="text-xs text-amber-100">
+            Couldn&apos;t load obligations — commitment figures may be stale. Check the RPC connection.
           </p>
         </div>
       )}
@@ -336,6 +351,29 @@ export function Vault() {
         isOwner={isOwner && canInteract}
         onChange={refresh}
       />
+    </section>
+  );
+}
+
+// Three-step starter shown only for empty treasuries: claim, deposit,
+// promise. Vanishes after the first deposit so the full board takes over.
+function GettingStarted() {
+  const steps = [
+    { n: "1", title: "Claim free test SUSD", body: "Faucet card below — testnet funds, no real value." },
+    { n: "2", title: "Deposit it", body: "Move SUSD into the vault. Totals update on confirmation." },
+    { n: "3", title: "Record an obligation", body: "Watch protected liquidity rise and deployable fall." },
+  ];
+  return (
+    <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
+      <h2 className="text-sm font-medium text-neutral-200">Start here — your treasury is empty</h2>
+      <ol className="mt-3 space-y-2">
+        {steps.map((s) => (
+          <li key={s.n} className="flex items-start gap-3 text-xs">
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white text-[10px] font-bold text-neutral-900">{s.n}</span>
+            <span><span className="font-medium text-neutral-200">{s.title}.</span> <span className="text-neutral-500">{s.body}</span></span>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }
